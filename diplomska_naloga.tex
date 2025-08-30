@@ -1,0 +1,1911 @@
+\documentclass[mat1, tisk]{fmfdelo}
+% \documentclass[fin1, tisk]{fmfdelo}
+% Če pobrišete možnost tisk, bodo povezave obarvane,
+% na začetku pa ne bo praznih strani po naslovu, …
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% METAPODATKI
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% - vaše ime
+\avtor{Mojca Božič}
+
+% - naslov dela v slovenščini
+\naslov{Kvaternioni in kvaternionske matrike}
+
+% - naslov dela v angleščini
+\title{Quaternions and matrices of quaternions}
+
+% - ime mentorja/mentorice s polnim nazivom:
+%   - doc.~dr.~Ime Priimek
+%   - izr.~prof.~dr.~Ime Priimek
+%   - prof.~dr.~Ime Priimek
+%   za druge variante uporabite ustrezne ukaze
+\mentor{doc.\ dr.\ Lucijan Plevnik}
+% \somentor{...}
+% \mentorica{...}
+% \somentorica{...}
+% \mentorja{...}{...}
+% \somentorja{...}{...}
+% \mentorici{...}{...}
+% \somentorici{...}{...}
+
+% - leto diplome
+\letnica{2025} 
+
+% - povzetek v slovenščini
+%   V povzetku na kratko opišite vsebinske rezultate dela. Sem ne sodi razlaga
+%   organizacije dela, torej v katerem razdelku je kaj, pač pa le opis vsebine.
+\povzetek{Kvaternioni so zaradi svoje posebne strukture in lastnosti uporabno orodje v kvantni fiziki, robotiki, sodobnem računalništvu ipd. 
+Obseg kvaternionov je primer nekomutativnega obsega, zato nas študij kvaternionskih matrik pripelje do zanimivih zaključkov. Hitro ugotovimo, da zaradi nekomutativnosti
+marsikatera lastnost kvaternionskih matrik, ki se na prvi pogled zdi očitna, zahteva bolj poglobljen razmislek. V delu bomo obravnavali osnovne definicije in lastnosti kvaternionov in kvaternionskih matrik ter jih primerjali 
+s kompleksnimi matrikami. Spoznali bomo alternativno definicijo kvaternionov in njeno uporabo pri študiju lastnosti matrik, dotaknili pa se bomo tudi študija lastnih vrednosti teh matrik.}
+
+% - povzetek v angleščini
+\abstract{Quaternions, due to their unique structure and properties, are a useful tool in quantum physics, robotics, modern computer science, and more. Quaternions are an example of a
+non-commutative division ring. This leads to interesting insights in the study of quaternionic matrices. A quick observation shows that, due to noncommutativity, many properties of quaternionic 
+matrices that at first glance seem obvious actually require deeper consideration. In this work, we will examine the basic definitions and properties of quaternions and quaternionic matrices 
+and compare them with complex matrices. We will explore an alternative definition of quaternions and its application in the study of matrix properties, and also touch upon the study of 
+eigenvalues of these matrices.}
+
+% - klasifikacijske oznake, ločene z vejicami
+%   Oznake, ki opisujejo področje dela, so dostopne na strani https://www.ams.org/msc/
+\klasifikacija{15B33, 20G20}
+
+% - ključne besede, ki nastopajo v delu, ločene s \sep
+\kljucnebesede{kvaternioni\sep kvaternionske matrike\sep lastne vrednosti\sep kompleksna adjungirana matrika}
+
+% - angleški prevod ključnih besed
+\keywords{quaternions\sep quaternionic matrices\sep eigenvalues\sep complex adjoint matrix} % angleški prevod ključnih besed
+
+% - angleško-slovenski slovar strokovnih izrazov
+%\slovar{
+% \geslo{angleški izraz}{slovenski izraz}
+% ...
+%}
+
+% - ime datoteke z viri (vključno s končnico .bib), če uporabljate BibTeX
+\literatura{literatura.bib}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DODATNE DEFINICIJE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% naložite dodatne pakete, ki jih potrebujete
+%\usepackage[utf8x]{inputenc} 
+
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{ulem}
+\usepackage{physics}
+\usepackage{enumitem}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{siunitx}
+
+\raggedbottom
+
+\usepackage[%
+    left = \glqq,%
+    right = \grqq,%
+    leftsub = \glq,%
+    rightsub = \grq%
+]{dirtytalk}
+
+\usepackage[math]{cellspace}
+\setlength\cellspacetoplimit{3pt}
+\setlength\cellspacebottomlimit{3pt}
+
+\expandafter\def\expandafter\normalsize\expandafter{%
+    \normalsize%
+    \setlength\abovedisplayskip{15pt}%
+    \setlength\belowdisplayskip{15pt}%
+    \setlength\abovedisplayshortskip{0pt}%
+    \setlength\belowdisplayshortskip{10pt}%
+}
+
+
+\numberwithin{equation}{section}
+
+% deklarirajte vse matematične operatorje, da jih bo LaTeX pravilno stavil
+% \DeclareMathOperator{\...}{...}
+
+% vstavite svoje definicije ...
+% \newcommand{\...}{...}
+
+\renewcommand\qedsymbol{{\footnotesize QED}}
+\renewcommand{\theenumi}{\roman{enumi}}
+\renewcommand{\labelenumi}{\theenumi.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ZAČETEK VSEBINE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\nocite{zhang}
+
+
+\section{Uvod}
+Kvaternione je prvi opisal matematik William Rowan Hamilton leta 1843. Takrat so matematiki nanje gledali le kot na
+zanimivo algebraično strukturo, v zadnjih letih pa so kvaternioni postali nepogrešljivo orodje v vedno širšem naboru 
+področij. Kot prvi so v začetku 19.\@ stoletja njihovo strukturo začeli uporabljati kvantni fiziki, danes pa se kvaternione
+uporablja tudi v računalniški grafiki, robotiki in na področju računalnškega vida. Kvaternioni v smislu algebraične 
+stukture so zanimivi, saj so primer nekomutativnega obsega s posebno ciklično strukturo. \\
+
+
+\noindent
+O matrikah nad poljem znamo povedati marsikaj. Poznamo njihove lastne vrednosti, znamo izračunati njihove determinante, vemo,
+kdaj se jih da diagonalizirati itd. Ko želimo te lastnosti študirati na kvaternionskih matrikah, hitro naletimo na oviro, 
+saj elementi matrik ne komutirajo. Začnemo se spraševati, ali imajo lastne vrednosti kvaternionskih matrik podobne lastnosti kot lastne 
+vrednosti kompleksne matrike. A morda to velja le za desne lastne vrednosti? V tem diplomskem delu si bomo skušali odgovoriti na ta in mnoga druga 
+vprašanja. Poskusili bomo ugotoviti, v katerih pogledih so si kompleksne in kvaternionske matrike podobne, in za katere lastnosti
+je komutativnost ključnega pomena. Prvi del diplomske naloge bomo posvetili osnovnim definicijam v obsegu kvaternionov in njihovim 
+lastnostim. Sledil bo pregled definicij in lastnosti kvaternionskih matrik, kjer bomo spoznali definicijo in pomen kompleksne 
+adjungirane matrike, zadnji del naloge pa bomo posvetili študiju lastnih vrednosti kvaternionskih matrik.
+
+\newpage
+
+\section{Kvaternioni}
+\subsection{Osnovne definicije}
+
+Najprej si oglejmo nekaj osnovnih definicij.
+
+\begin{definicija}
+    \textbf{Kvaternion} je vektor oblike 
+        \[ x = x_{0} + x_{1}i + x_{2}j + x_{3}k, \; \; x_{0}, \, x_{1}, \, x_{2}, \, x_{3} \in \mathbb{R},\] 
+        pri čemer velja
+        $$i^2 = j^2 = k^2 = ijk = -1,$$
+        $$ij = -ji = k,$$
+        $$jk = -kj = i,$$
+        $$ki = -ik = j.$$
+        Taki vektorji tvorijo štirirazsežen vektorski prostor nad $\mathbb{R}$ z bazo $\{1, i, j, k\}$, ki ga imenujemo \textbf{kvaternioni} in ga označimo s $\mathbb{H}$.
+\end{definicija}
+
+\begin{definicija}
+    Naj bosta $x = x_{0} + x_{1}i + x_{2}j + x_{3}k, \: y = y_{0} + y_{1}i + y_{2}j + y_{3}k \in \mathbb{H}$. V $\mathbb{H}$ defniriramo
+    seštevanje in množenje na naslednji način:
+    \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                x + y &= (x_{0} + y_{0}) + (x_{1} + y_{1})  i + (x_{2} + y_{2})  j + (x_{3} + y_{3})  k \\
+                xy &= (x_{0}y_{0} - x_{1}y_{1} - x_{2}y_{2} - x_{3}y_{3})
+                    + (x_{0}y_{1} + x_{1}y_{0} + x_{2}y_{3} - x_{3}y_{2})i \\
+                    & \quad + (x_{0}y_{2} - x_{1}y_{3} + x_{2}y_{0} + x_{3}y_{1})j
+                            + (x_{0}y_{3} + x_{1}y_{2} - x_{2}y_{1} + x_{3}y_{0})k
+            \end{aligned}
+    \end{equation*}
+\end{definicija}
+
+\begin{definicija}
+    Naj bo $x = x_{0} + x_{1}i + x_{2}j + x_{3}k \in \mathbb{H}$.
+    Število
+    \[x_{0} = \mathrm{Re} \: x \] 
+    imenujemo \textbf{realni del} $x$,
+    število
+    \[ x_{1} + x_{2}i = \mathrm{Co} \: x \]
+    imenujemo \textbf{kompleksni del} $x$,
+    število
+    \[ x_{1}i + x_{2}j + x_{3}k = \mathrm{Im} \: x \]
+    pa imenujemo \textbf{imaginarni del} $x$.
+    \textbf{Konjugiran} $x$ definiramo kot 
+    \[ x^{*} = x_{0} - x_{1}i - x_{2}j - x_{3}k, \]
+    \textbf{absolutno vrednost} $x$ pa definiramo kot 
+    \[ |x| = \sqrt{x_{0}^2 + x_{1}^2 + x_{2}^2 + x_{3}^2} \, . \]
+\end{definicija}
+
+\subsection{Lastnosti kvaternionov}
+
+V tem razdelku si bomo ogledali nekaj lastnosti kvaternionov.
+
+\begin{trditev}\label{eq1}
+    V $\mathbb{H}$ veljajo naslednje izjave.
+    \begin{enumerate}
+        \item Naj bo $a \in \mathbb{H}$. Enačba $\, ax = xa$ velja za vsak $x \in \mathbb{H}$ natanko tedaj, ko je $a \in \mathbb{R}$.
+        \item Za vsak $x \in \mathbb{H}$ velja $x^2 = {(\mathrm{Re} \: x)}^2 - {|\mathrm{Im} \: x|}^2 + 2 \, \mathrm{Re} \: x \, \mathrm{Im} \: x$. 
+        \item Za vsak $x \in \mathbb{H}$ velja $x^{*} x = x x^{*} = {|x|}^2$.
+        \item Za vsaka $x, y \in \mathbb{H}$ velja $(xy)^{*} = {y}^{*} {x}^{*}$.
+        \item Enakost $x^{*} = x$ velja natanko tedaj, ko je $x \in \mathbb{R}$.
+        \item Enačba $x^2 = -1$ ima neskončno mnogo rešitev v $\mathbb{H}$.
+        \item Vsak kvaternion $x$ lahko enolično zapišemo kot $x = c+ dj$ za $c, d \in \mathbb{C}$.
+        \item Za vsak $c \in \mathbb{C}$ velja $j c = \overline{c} j$.
+        \item Za vsaka $x, y \in \mathbb{H}$ velja $|xy| = |x| \, |y|$.
+    \end{enumerate}
+\end{trditev}
+
+\begin{dokaz}
+    Naj bodo $x, y, z \in \mathbb{H}$.
+    \begin{enumerate}
+        \item Naj bo $a = a_{0} + a_{1}i + a_{2}j + a_{3}k \in \mathbb{H}$, kjer $a_i \in \mathbb{R}$ za $i = 0, 1, 2, 3$, in naj za vsak $x \in \mathbb{H}$ velja
+        $ax = xa$. Ker $a$ komutira z $i$, velja $ai=ia$ oziroma 
+        $$(a_{0} + a_{1}i + a_{2}j + a_{3}k)i = i(a_{0} + a_{1}i + a_{2}j + a_{3}k).$$
+        Obe strani razpišemo in dobimo
+        $$-a_{1} + a_{0}i + a_{3}j - a_{2}k = -a_{1} + a_{0}i - a_{3}j  + a_{2}k.$$
+        Sledi $a_{2} = a_{3} = 0$.
+        Sedaj upoštevamo, da $a$ komutira z $j$, in dobimo
+        $$(a_{0} + a_{1}i)j = j(a_{0} + a_{1}i).$$
+        Iz tega podobno kot zgoraj sledi $a_{1} = 0$.
+        Dobimo $a = a_0$ oziroma $a \in \mathbb{R}$. Obratno, če je $a\in\mathbb{R}$, potem kot skalar komutira z vsakim $x\in\mathbb{H}$, torej $ax=xa$.
+        \item Pišimo $x = x_{0} + x_{1}i + x_{2}j + x_{3}k = \mathrm{Re} \: x + \mathrm{Im} \: x$. Oglejmo si 
+        \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                x^2 &= (\mathrm{Re} \: x + \mathrm{Im} \: x)(\mathrm{Re} \: x + \mathrm{Im} \: x) \\
+                &= (\mathrm{Re} \: x)^2 + (\mathrm{Re} \: x)(\mathrm{Im} \: x) + (\mathrm{Im} \: x)(\mathrm{Re} \: x) + (\mathrm{Im} \: x)(\mathrm{Im} \: x)
+            \end{aligned}
+        \end{equation*}
+        Po točki \textit{i}.\@ je to enako
+        $$x^2 = (\mathrm{Re} \: x)^2 + 2 \,\mathrm{Re} \: x \, \mathrm{Im} \: x + (\mathrm{Im} \: x)^2.$$
+        Sedaj izračunamo
+        \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                (\mathrm{Im} \: x)^2 &=  (x_{1}i + x_{2}j + x_{3}k)(x_{1}i + x_{2}j + x_{3}k)\\
+                & =  x_{1}i^2 + x_{1}x_{2}ij + x_{1}x_{3}ik + x_{1}x_{2}ji + x_{2}j^2 \\
+                &\quad + x_{2}x_{3}jk + x_{1}x_{3}ki + x_{2}x_{3}kj + x_{3}k^2 \\
+                &= -x_{1}^2 -x_{2}^2 -x_{2}^2 \\
+                &= -{|\mathrm{Im} \: x|}^2.
+            \end{aligned}
+        \end{equation*}
+        Pri tem smo upoštevali enakosti $i^2 = j^2 = k^2 = -1$, $ij = -ji$, $jk = -kj$, $ki = -ik$ in točko \textit{i}. Sledi
+        \begin{equation*}
+            x^2 = (\mathrm{Re} \: x)^2 + 2 \,\mathrm{Re} \: x \, \mathrm{Im} \: x -{|\mathrm{Im} \: x|}^2.
+        \end{equation*}
+        \item Pišimo $x = \mathrm{Re} \: x + \mathrm{Im} \: x$ in ${x}^* = \mathrm{Re} \: x - \mathrm{Im} \: x$. Ker je $\mathrm{Re} \: x \in \mathbb{R}$, po točki \textit{i}.\@ 
+        komutira z $\mathrm{Im} \: x$. Sledi
+        \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                x^{*} x &=  (\mathrm{Re} \: x - \mathrm{Im} \: x)(\mathrm{Re} \: x + \mathrm{Im} \: x)\\
+                &= {(\mathrm{Re} \: x)}^2 + (\mathrm{Re} \: x)(\mathrm{Im} \: x) - (\mathrm{Im} \: x)(\mathrm{Re} \: x) - (\mathrm{Im} \: x)^2\\
+                &= {(\mathrm{Re} \: x)}^2 - (\mathrm{Re} \: x)(\mathrm{Im} \: x) + (\mathrm{Im} \: x)(\mathrm{Re} \: x) - (\mathrm{Im} \: x)^2\\
+                &= (\mathrm{Re} \: x + \mathrm{Im} \: x)(\mathrm{Re} \: x - \mathrm{Im} \: x)\\
+                &= x x^{*}.
+            \end{aligned}
+        \end{equation*}
+        Sedaj upoštevamo še zvezo $(\mathrm{Im} \: x)^2 = -{|\mathrm{Im} \: x|}^2$ iz dokaza točke \textit{ii}.\ in dobimo
+        \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                x^{*} x &=  (\mathrm{Re} \: x - \mathrm{Im} \: x)(\mathrm{Re} \: x + \mathrm{Im} \: x)\\
+                &= {(\mathrm{Re} \: x)}^2 + \mathrm{Re} \: x \: \mathrm{Im} \: x - \mathrm{Re} \: x \: \mathrm{Im} \: x - (\mathrm{Im} \: x)^2\\
+                &= {(\mathrm{Re} \: x)}^2 + {|\mathrm{Im} \: x|}^2\\
+                &= {|x|}^2.
+            \end{aligned}
+        \end{equation*}
+        \item Naj bosta $x = x_{0} + x_{1}i + x_{2}j + x_{3}k, \, y = y_{0} + y_{1}i + y_{2}j + y_{3}k \in \mathbb{H}$. Izračunajmo
+        \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                (xy)^{*} & = \Big((x_{0} + x_{1}i + x_{2}j + x_{3}k)(y_{0} + y_{1}i + y_{2}j + y_{3}k)\Big)^{*} \\
+                & = (x_{0}y_{0} + x_{0}y_{1}i + x_{0}y_{2}j + x_{0}y_{3}k + x_{1}y_{0}i - x_{1}y_{1} + x_{1}y_{2}k - x_{1}y_{3}j \\
+                &+ x_{2}y_{0}j - x_{2}y_{1}k - x_{2}y_{2} + x_{2}y_{3}i + x_{3}y_{0}k + x_{3}y_{1}j - x_{3}y_{2}i - x_{3}y_{3})^{*} \\
+                &= ((x_{0}y_{0} - x_{1}y_{1} - x_{2}y_{2} - x_{3}y_{3}) + (x_{0}y_{1} + x_{1}y_{0} + x_{2}y_{3} - x_{3}y_{2})i \\
+                &+ (x_{0}y_{2} - x_{1}y_{3} + x_{2}y_{0} + x_{3}y_{1})j + (x_{0}y_{3} + x_{1}y_{2} - x_{2}y_{1} + x_{3}y_{0})k)^{*} \\
+                &= (x_{0}y_{0} - x_{1}y_{1} - x_{2}y_{2} - x_{3}y_{3}) - (x_{0}y_{1} + x_{1}y_{0} + x_{2}y_{3} - x_{3}y_{2})i \\
+                &- (x_{0}y_{2} - x_{1}y_{3} + x_{2}y_{0} + x_{3}y_{1})j - (x_{0}y_{3} + x_{1}y_{2} - x_{2}y_{1} + x_{3}y_{0})k \\
+                &= (y_{0} - y_{1}i - y_{2}j - y_{3}k)(x_{0} - x_{1}i - x_{2}j - x_{3}k) \\
+                &= y^{*}x^{*}.
+            \end{aligned}
+        \end{equation*}
+        \item Pišimo $x = \mathrm{Re} \: x + \mathrm{Im} \: x$ in ${x}^* = \mathrm{Re} \: x - \mathrm{Im} \: x$. Sledi
+        \begin{equation*}
+            \setlength{\jot}{10pt}
+                \begin{aligned}
+                    x = x^{*} &\Longleftrightarrow \mathrm{Re} \: x + \mathrm{Im} \: x = \mathrm{Re} \: x - \mathrm{Im} \: x \\
+                    &\Longleftrightarrow \mathrm{Im} \: x = 0 \\
+                    &\Longleftrightarrow x \in \mathbb{R}.
+                \end{aligned}
+        \end{equation*}
+        \item Naj bo $x = x_{0} + x_{1}i + x_{2}j + x_{3}k$. Iščemo rešitve enačbe $x^2 = -1$. Ta enačba je po točki \textit{iii.}\@ ekvivalentna enačbi
+        $$(\mathrm{Re} \: x)^2 - |\mathrm{Im} \: x|^2 + 2 \, \mathrm{Re} \: x \, \mathrm{Im} \: x = -1.$$
+        Če primerjamo imaginarni del leve in desne strani enačbe, dobimo
+        $$\mathrm{Re} \: x \, \mathrm{Im} \: x = 0.$$
+        Če bi bil $\mathrm{Re} \: x$ neničeln, bi bil $\mathrm{Im} \: x = 0$, kar je v protislovju z začetno enačbo.
+        Torej je $\mathrm{Re} \: x = 0$. Zgornja enačba se poenostavi v 
+        $$|\mathrm{Im} \: x| = 1.$$
+        V množici rešitev enačbe so torej vsi kvaternioni $x = x_{1}i + x_{2}j + x_{3}k$, za katere je 
+        $$\mathrm{Im} \: x = x_{1}^2 + x_{2}^2 + x_{3}^2 = 1.$$
+        Ta enačba parametrizira enotsko sfero $S^2$ v $\mathbb{R}^{3}$, na kateri leži nešteto mnogo točk, 
+        torej ima začetna enačba res nešteto mnogo rešitev v $\mathbb{H}$.
+        \item Naj bo
+        $x = x_0 + x_1 i + x_2 j + x_3 k$.
+        Ker velja $k=ij$, lahko člen s $k$ zapišemo kot $x_3(ij)=(x_3 i)j$. Tako dobimo
+        \[
+        x = (x_0 + x_1 i) + (x_2 + x_3 i)j.
+        \]
+        Tu sta $x_0+x_1 i\in\mathbb{C}$ in $x_2+x_3 i\in\mathbb{C}$, zato lahko definiramo kompleksni števili $c:=x_0+x_1 i, \, d:=x_2+x_3 i $
+        in pišemo $x=c+dj$. Pokazati moramo še, da je tak zapis enoličen. Če je 
+        $c+dj = \tilde{c} + \tilde{d}j$
+        še za neka $\tilde{c}, \, \tilde{d} \in\mathbb{C}$, potem je
+        \[
+        (c-\tilde{c})+(d-\tilde{d})j=0.
+        \]
+        Če pišemo $c - \tilde{c} = \mathrm{Re} \: (c-\tilde{c}) + \mathrm{Im} \: (c-\tilde{c}) \, i$ in $d-\tilde{d} = \mathrm{Re} \:(d-\tilde{d}) + \mathrm{Im} \: (d-\tilde{d})\, i$
+        ter upoštevamo $ij = k$, iz zgornje enačbe dobimo
+        $$\mathrm{Re} \: (c-\tilde{c}) + \mathrm{Im} \: (c-\tilde{c}) \, i + \mathrm{Re} \:(d-\tilde{d})\, j + \mathrm{Im} \: (d-\tilde{d})\, k = 0.$$
+        Sledi $\mathrm{Re} \: (c-\tilde{c}) = \mathrm{Im} \: (c-\tilde{c}) = \mathrm{Re} \:(d-\tilde{d}) = \mathrm{Im} \:(d-\tilde{d})= 0$ oz.\ 
+        $c-\tilde{c} = d-\tilde{d} = 0$. Tako dobimo $c=\tilde{c}$ in $d=\tilde{d}$.
+        \item Pišimo $c = a + bi \in \mathbb{C}$. Računamo
+        $$jc = j(a + bi) = ja + bji = aj - bk.$$
+        Po drugi strani 
+        $$\overline{c}j = (a -bi)j = aj - bij = aj - bk.$$
+        \item Velja $|xy| = \sqrt{(xy)^{*}(xy)}$. Po točki \textit{iv}.\@ velja $|xy| = \sqrt{y^{*}x^{*}xy}$, to pa je po točki \textit{iii}.\@  enako $\sqrt{y^{*}{|x|}^2y} = |x|\sqrt{y^{*}y} = |x| |y|$.
+    \end{enumerate}
+\end{dokaz}
+
+Opremljeni s temi lastnostmi se lahko prepričamo, da kvaternioni zadoščajo lastnostim obsega, kot omenjeno
+v uvodu.
+
+\begin{trditev}\label{obseg}
+    Množica $(\mathbb{H}, +, \cdot)$ tvori obseg. Ničla v tem obsegu je enaka $0 = 0 + 0i + 0j + 0k$, enota pa $1 = 1 + 0i + 0j + 0k$.
+\end{trditev}
+
+\begin{dokaz}
+    To, da $(\mathbb{H}, +)$ zadošča lastnostim Abelove grupe, je očitno. Prav tako je očiten obstoj enote za množenje. Oglejmo si dokaz asociativnosti množenja. Pokazati moramo, da za vse $x, y, z 
+    \in \mathbb{H}$ velja 
+    $(xy)z = x(yz)$.
+    Pišimo $x = \mathrm{Re} \: x + \mathrm{Im} \: x$, $y = \mathrm{Re} \: y + \mathrm{Im} \: y$, $z = \mathrm{Re} \: z + \mathrm{Im} \: z$. Najprej zmnožimo $x$ in $y$:
+        \begin{equation*}
+            \setlength{\jot}{10pt}
+                \begin{aligned}
+                    xy &= (\mathrm{Re} \: x + \mathrm{Im} \: x)(\mathrm{Re} \: y + \mathrm{Im} \: y)\\
+                    &= \mathrm{Re} \: x \:\mathrm{Re} \: y +  \mathrm{Re} \: x \:\mathrm{Im} \: y + \mathrm{Im} \: x \:\mathrm{Re} \: y + \mathrm{Im} \: x \:\mathrm{Im} \: y\\
+                \end{aligned}
+        \end{equation*}
+        Sedaj ta izraz pomnožimo z desne z $z$:
+        \begin{equation*} 
+            \setlength{\jot}{10pt}
+                \begin{aligned}
+                    (xy)z &=  (\mathrm{Re} \: x \:\mathrm{Re} \: y +  \mathrm{Re} \: x \:\mathrm{Im} \: y + \mathrm{Im} \: x \:\mathrm{Re} \: y + \mathrm{Im} \: x \:\mathrm{Im} \: y)(\mathrm{Re} \: z + \mathrm{Im} \: z)\\
+                    &= \mathrm{Re} \: x \:\mathrm{Re} \: y \: \mathrm{Re} \: z + \mathrm{Re} \: x \:\mathrm{Im} \: y \: \mathrm{Re} \: z + \mathrm{Im} \: x \:\mathrm{Re} \: y \: \mathrm{Re} \: z + \mathrm{Im} \: x \:\mathrm{Im} \: y \: \mathrm{Re} \: z\\
+                    &\quad+ \mathrm{Re} \: x \:\mathrm{Re} \: y \: \mathrm{Im} \: z + \mathrm{Re} \: x \:\mathrm{Im} \: y \: \mathrm{Im} \: z + \mathrm{Im} \: x \:\mathrm{Re} \: y \: \mathrm{Im} \: z + \mathrm{Im} \: x \:\mathrm{Im} \: y \: \mathrm{Im} \: z\\
+                \end{aligned}
+        \end{equation*}
+        Sedaj upoštevamo, da so $\mathrm{Re} \: x, \mathrm{Re} \: y, \mathrm{Re} \: z \in \mathbb{R}$, torej je po točki \textit{i}.\ trditve~\ref{eq1} zgornji izraz enak
+        \begin{equation*}
+            \setlength{\jot}{10pt}
+                \begin{aligned}
+                    (xy)z &=  \mathrm{Re} \: x \:\mathrm{Re} \: y \: \mathrm{Re} \: z + \mathrm{Re} \: x \:\mathrm{Im} \: y \: \mathrm{Re} \: z+ \mathrm{Re} \: x \:\mathrm{Re} \: y \: \mathrm{Im} \: z + \mathrm{Re} \: x \:\mathrm{Im} \: y \: \mathrm{Im} \: z\\
+                    &\quad + \mathrm{Im} \: x \:\mathrm{Re} \: y \: \mathrm{Re} \: z+ \mathrm{Im} \: x \:\mathrm{Im} \: y \: \mathrm{Re} \: z+ \mathrm{Im} \: x \:\mathrm{Re} \: y \: \mathrm{Im} \: z+ \mathrm{Im} \: x \:\mathrm{Im} \: y \: \mathrm{Im} \: z\\
+                    &= (\mathrm{Re} \: x + \mathrm{Im} \: x)(\mathrm{Re} \: y \: \mathrm{Re} \: z + \mathrm{Im} \: y \: \mathrm{Re} \: z + \mathrm{Re} \: y \: \mathrm{Im} \: z + \mathrm{Im} \: y \: \mathrm{Im} \: z) \\
+                    &= x(yz).
+                \end{aligned}
+        \end{equation*}
+        Sedaj pokažimo levo distributivnost. Če pokažemo, da velja $u(y + z) = uy + uz$ za $u \in \{i, j, k\}$, bo po definiciji množenja kvaternionov iz tega sledilo
+        $x(y + z) = xy + xz$ za poljuben $x \in \mathbb{H}$. Naj bosta sedaj $y = y_{0} + y_{1}i + y_{2}j + y_{3}k$, $z = z_{0} + z_{1}i + z_{2}j + z_{3}k$ iz $\mathbb{H}$. Oglejmo si
+        \begin{equation*}
+            \setlength{\jot}{10pt}
+                \begin{aligned}
+                    i(y + z) &=  i((y_{0} + z_0) + (y_{1} + z_1)i + (y_{2} + z_{2})j + (y_{3}+ z_{3})k) \\
+                             &= (y_{0} + z_0)i - (y_{1} + z_1) + (y_{2} + z_{2})k -(y_{3}+ z_{3})j \\
+                             &= y_{0}i + z_0i - y_{1} - z_1 + y_{2}k + z_{2}k - y_{3}j - z_{3}j \\
+                             &= iy + iz.
+                \end{aligned}
+        \end{equation*}
+        Pri tem smo upoštevali definicijo seštevanja in množenja v $\mathbb{H}$, dejstvo, da $i$ komutira z elementi iz $\mathbb{R}$, in pravila množenja
+        za $i, j, k$.
+        Na enak način pokažemo še $j(y + z) = jy + jz$ in $k(y + z) = ky + kz$. Podobno pokažemo tudi desno distributivnost. 
+
+        \medskip
+        Za konec dokaza pokažimo še, da je vsak neničeln kvaternion obrnljiv. Točka \textit{iii}.\ trditve~\ref{eq1}
+        pove, da velja
+        $xx^{*} = x^{*}x = |x|^2  \geq 0.$
+        Posebej, za $x\neq 0$ je $|x|^2 > 0$. Definiramo
+        $
+        x^{-1}\;:=\;\frac{x^{*}}{|x|^2}.
+        $
+        Potem velja
+        \[
+        xx^{-1} \;=\; x\,\frac{x^{*}}{|x|^2} \;=\; \frac{xx^{*}}{|x|^2} \;=\; \frac{|x|^2}{|x|^2} \;=\; 1.
+        \]
+        Ker velja $x^{*} x = x x^{*}$, res dobimo $xx^{-1} \;=\; x^{-1}x \;=\; 1$.
+\end{dokaz}
+Izkaže se, da obseg ni edina zanimiva algebraična struktura, ki jo tvorijo kvaternioni. Naslednja trditev pove, da lahko na kvaternione gledamo tudi kot na vektorski prostor.
+
+\begin{trditev}\label{vektorski_prostor}
+    Kvaternioni $\mathbb{H}$ so vektorski prostor nad $\mathbb{R}$ z bazo $\{1, i, j, k\}$. Ta vektorski prostor je izomorfen prostoru $\mathbb{R}^4$.
+\end{trditev}
+
+\begin{dokaz}
+    Da $\mathbb{H}$ zadošča zahtevam za vektorski prostor, ni težko videti. Definirajmo preslikavo
+    $\Phi : \mathbb{H} \rightarrow \mathbb{R}^4$ s predpisom
+    $$\Phi(x_0 + x_1 i + x_2 j + x_3 k) = (x_0, x_1, x_2, x_3),$$
+    kjer so $x_0, \, x_1, \, x_2, \, x_3 \, \in \mathbb{R}$. Inverz $\Phi ^{-1}: \mathbb{R}^4 \rightarrow \mathbb{H}$ te preslikave
+    je enak 
+    $$\Phi ^{-1} (x_0, x_1, x_2, x_3) = x_0 + x_1 i + x_2 j + x_3 k.$$
+     Preveriti moramo, da za $\Phi$ velja 
+    $$\Phi(\lambda x + \mu y) = \lambda \Phi(x) + \mu \Phi(y)$$
+    za vse $x, y \in \mathbb{H}, \, \lambda, \mu \in \mathbb{R}$. Vzemimo poljubna $x = x_0 + x_1 i + x_2 j + x_3 k$ in $y = y_0 + y_1 i + y_2 j + y_3 k$
+    iz $\mathbb{H}$ ter poljubna skalarja $\lambda, \mu \in \mathbb{R}$. Sledi
+    \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                \Phi(\lambda x + \mu y) &= \Phi(\lambda (x_0 + x_1 i + x_2 j + x_3 k) + \mu (y_0 + y_1 i + y_2 j + y_3 k)) \\
+                                        &= \Phi(\lambda x_0 + \mu y_0 + (\lambda x_1 + \mu y_1) i + (\lambda x_2 + \mu y_2) j + (\lambda x_3 + \mu y_3) k) \\
+                                        &= (\lambda x_0 + \mu y_0, \lambda x_1 + \mu y_1, \lambda x_2 + \mu y_2, \lambda x_3 + \mu y_3) \\
+                                        &= \lambda (x_0, x_1, x_2, x_3) + \mu (y_0, y_1, y_2, y_3) \\
+                                        &= \lambda \Phi(x) + \mu \Phi(y).
+            \end{aligned}
+    \end{equation*}
+    Pri tem smo upoštevali, da $i, j, k$ komutirajo s skalarji iz $\mathbb{R}$.
+\end{dokaz}
+
+\begin{definicija}
+    Kvaterniona $x$ in $y$ sta \textbf{podobna}, če obstaja $u \in \mathbb{H}\setminus \{0\}$, tako da velja
+    $$u^{-1}xu = y.$$
+    Pišemo $x \sim y$.
+\end{definicija}
+
+\begin{trditev}
+    Relacija $\sim$ je ekvivalenčna relacija. 
+\end{trditev}
+
+\begin{dokaz}
+    Dokazati želimo, da je $\sim$ ekvivalenčna relacija, torej da je refleksivna, simetrična in tranzitivna. Pokažimo najprej refleksivnost. Za vsak kvaternion $x \in \mathbb{H}$ velja
+    $x = 1^{-1}\, x \, 1$,
+    torej je $\sim$ refleksivna. Za dokaz simetričnosti moramo preveriti, ali iz $x \sim y$ sledi $y \sim x$. Recimo, da velja $x \sim y$. Obstaja torej
+    $u \in \mathbb{H}\setminus \{0\}$, da je 
+    $$u^{-1}xu = y.$$ 
+    Če to enačbo z leve pomnožimo z $u$ in z desne z $u^{-1}$, dobimo 
+    $$x = uyu^{-1} = v^{-1}yv$$
+    za $v := u^{-1}$, torej velja tudi $y \sim x$. Ostane 
+    nam dokazati še tranzitivnost. Naj bodo $x, z, y \in \mathbb{H}$ in recimo, da velja $x \sim y$ in $y \sim z$. To pomeni, da obstajata taka $u, v \in \mathbb{H}\setminus \{0\}$,
+    da velja 
+    $u^{-1}xu = y$
+    in
+    $v^{-1}yv = z$.
+    Sedaj lahko zapišemo
+    $$v^{-1}u^{-1}xuv = z.$$
+    Iz dokaza trditve~\ref{obseg} vemo, da je $x^{-1}\;=\displaystyle \frac{x^{*}}{|x|^2}$, zato po točki \textit{iv}.\@ in \textit{ix}.\ trditve~\ref{eq1} sledi
+    $$(uv)^{-1}xuv = z.$$
+    Ker sta $u, v \neq 0$, sledi $uv \neq 0$ in res velja $x \sim z$, torej je $\sim$ tranzitivna relacija.
+\end{dokaz}
+
+\begin{opomba}
+    Z $\left[x\right]$ označimo ekvivalenčni razred, ki pripada elementu $x$.
+\end{opomba}
+
+\begin{lema}\label{ekvivalencni_razred}
+    Naj bo $a = a_0 + a_1 i  +  a_2 j  +  a_3 k  \in \mathbb{H}$. Označimo $\tilde{a} = a_0 \, + \, \sqrt{a_1^2 + a_2^2 + a_3^2} \, i$. Potem velja $a \sim \tilde{a}$, 
+    torej $a \in \left[\tilde{a}\right]$.
+\end{lema}
+
+\begin{dokaz}
+    Pokazati moramo, da obstaja $x \in \mathbb{H} \setminus \{0\}$, ki reši enačbo
+    \begin{equation*}
+        ax = x \tilde{a}.
+    \end{equation*}
+    Če je $a \in \mathbb{R}$, zgornjo enačbo reši $x = 1$. Za $a \in \mathbb{C}$ ločimo dve možnosti. Če je $a_1 > 0$, velja $a = \tilde{a}$ in enačbo reši $x = 1$. 
+    Če pa je $a_1 < 0$, velja $\tilde{a} = \overline{a}$ in po točki \textit{viii}.\ trditve~\ref{eq1} enačbo reši $x = j$.
+    Denimo sedaj, da $a \notin \mathbb{C}$. Označimo $r = \sqrt{a_1^2 + a_2^2 + a_3^2}$ in definiramo 
+    $x = a_1 \, + \, r -a_3j + a_2k$. Sledi 
+        \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                ax &= (a_0 + a_1 i  +  a_2 j  +  a_3 k)( a_1  +  r -a_3j + a_2k)   \\
+                &= a_0 \, a_1 + a_0 \, r - a_0 \, a_3 \, j + a_0 \, a_2 \, k + a_1^2 \, i  + a_1 \, r \, i - a_1\, a_3 \, k - a_1\, a_2 \, j \\
+                &\quad + a_1\, a_2 \, j + a_2\, r \, j + a_2\, a_3 + a_2^2 \, i + a_1\, a_3 \, k + a_3\, r \, k + a_3^2 \, i - a_2\, a_3 \\
+                &= r \, (a_1 \, i  +  a_2 \, j  +  a_3 \, k) + (a_1^2 + a_2^2 + a_3^2)\, i + a_0 \, (a_1 + r -a_3 \, j + a_2 \, k) \\
+                &= ( a_1 \, + \, r -a_3j + a_2k) (a_0 \, + \, r \, i) \\
+                &= x \tilde{a}.
+            \end{aligned}
+    \end{equation*}
+    Iz $a \notin \mathbb{C}$ sledi $x \neq 0$, torej smo našli tak neničeln $x$, da velja $x^{-1}ax = \tilde{a}$.  
+\end{dokaz}
+
+\begin{lema}\label{pod}
+    Kvaterniona $x$ in $y$ sta podobna natanko tedaj, ko velja $\mathrm{Re} \: x = \mathrm{Re} \: y$ in $|\mathrm{Im} \: x | = |\mathrm{Im} \: y |$.
+\end{lema}
+
+\begin{dokaz}
+    Predpostavimo najprej, da za $x, y \in \mathbb{H}$ velja $\mathrm{Re} \: x = \mathrm{Re} \: y$ in $\lvert \mathrm{Im} \: x  \rvert = \lvert \mathrm{Im} \: y  \rvert$.
+    Po lemi~\ref{ekvivalencni_razred} vemo, da velja  
+    $x \sim  \mathrm{Re} \: x + \lvert \mathrm{Im} \: x  \rvert \, i = \mathrm{Re} \: y + \lvert \mathrm{Im} \: y  \rvert \, i \sim y$, torej sta $x$ in $y$ res podobna.
+    
+    \medskip
+    Pokažimo, da velja tudi obratno. Recimo, da sta kvaterniona $x$ in $y$ podobna. Po lemi~\ref{ekvivalencni_razred} vemo, da velja  
+    $x \sim  \mathrm{Re} \: x + \lvert \mathrm{Im} \: x  \rvert \, i$ in $y \sim  \mathrm{Re} \: y + \lvert \mathrm{Im} \: y  \rvert \, i$. Ker
+    je $\sim$ tranzitivna relacija, sledi $\mathrm{Re} \: x + \lvert \mathrm{Im} \: x  \rvert \, i \sim \mathrm{Re} \: y + \lvert \mathrm{Im} \: y  \rvert \, i$.
+    Pokazati moramo, da sta dve kompleksni števili z nenegativnima imaginarnima deloma podobni natanko tedaj, ko sta enaki. Vzemimo poljuben $x = a + bi \in \mathbb{C}$, in 
+    poglejmo, katera kompleksna števila so v njegovem ekvivalenčnem razredu. Naj bo $q = q_0 + q_1 i + q_2 j + q_3 k \, \in \mathbb{H} \setminus \{0\}$. Po nekaj računanja dobimo
+    \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                q x q^{-1} &= q a q^{-1} + q bi q^{-1} = a + \frac{b}{|q|^2}qiq^*\\
+                        &= a + \frac{1}{{\lvert q \rvert}^2} \, b((q_0^2 + q_1^2 - q_2^2 - q_3^2)i 
+                        + 2(q_0 q_3 + q_1 q_2) j + 2(q_1 q_3 - q_0 q_2)k).   
+            \end{aligned}
+    \end{equation*}
+    Nas zanimajo $q x q^{-1} \in \mathbb{C}$, torej mora za $q$ veljati
+    $$q_0 q_3 + q_1 q_2 = 0, \quad q_1 q_3 - q_0 q_2 = 0.$$
+    To je ekvivalentno enačbi $(q_1 + i q_0)(\,q_2 - i q_3\,) = 0$, torej mora veljati
+    $q_2 = q_3 = 0$ ali $q_0 = q_1 = 0$.
+    V obeh primerih sledi
+    $$q x q^{-1} = \frac{1}{{\lvert q \rvert}^2} \, (\lvert q \rvert^2 a + \lvert q \rvert^2 bi) = a + bi.$$
+    Iz tega pa dobimo, da je $\mathrm{Re} \: x = \mathrm{Re} \: y$ in $\lvert \mathrm{Im} \: x  \rvert = \lvert \mathrm{Im} \: y  \rvert$.
+\end{dokaz}
+
+\begin{opomba}\label{neskoncno_mnogo_el}
+    Iz leme~\ref{pod} sledi, da za $x \notin \mathbb{R}$ ekvivalenčni razred $\left[x\right]$ vsebuje neskončno mnogo elementov, za $x \in \mathbb{R}$
+    pa je $\left[x\right] = x$.
+\end{opomba}
+
+Za konec tega poglavja si oglejmo še izrek in lemo, ki bosta ključna za dokazovanje nekaterih trditev v nadaljevanju. 
+
+\begin{izrek}\label{enacba}
+    Naj bodo $\alpha, \beta, \gamma \in \mathbb{H}$. Če $\alpha$ in $\gamma$ nista podobna, ima enačba
+    $$x\alpha - \gamma x = \beta$$
+    enolično rešitev v $\mathbb{H}$.
+\end{izrek}
+
+\begin{dokaz}
+    Naj bodo $\alpha, \beta, \gamma \in R$ in $\alpha \nsim \gamma$. Definiramo preslikavo $T: \mathbb{H} \rightarrow 
+    \mathbb{H}$ s predpisom
+    $$T(x) = x\alpha - \gamma x.$$
+    Sledi, da je naša enačba ekvivalentna enačbi
+    $T(x) = b$.
+    Pokazati hočemo, da je ta preslikava bijektivna. Vemo, da za linearne preslikave velja, da so bijektivne natanko
+    tedaj, ko imajo trivialno jedro. Če torej pokažemo, da je $T$ linearna preslikava, za katero velja $\ker T = \{0\}$,
+    bomo s tem dokazali trditev. 
+    
+    \medskip
+    Najprej se prepričajmo, da je $T$ res linearna preslikava. Trditev~\ref{vektorski_prostor} pove, da je $\mathbb{H}$ 
+    vektorski prostor nad $\mathbb{R}$. Sedaj pokažimo, da je $T$ aditivna. Naj bosta $x, y \in \mathbb{H}$ in 
+    $\lambda \in \mathbb{R}$.  Velja
+    \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                T(x + y) &= (x + y)\alpha - \gamma (x + y) \\
+                &= x\alpha + y\alpha - \gamma x - \gamma y \\
+                &= T(x) + T(y),
+            \end{aligned}
+    \end{equation*}
+    torej je $T$ aditivna. Sedaj preverimo še, če je $T$ homogena. Oglejmo si
+    \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                T(\lambda x) &= (\lambda x)\alpha - \gamma (\lambda x) \\
+                &= \lambda (x\alpha - \gamma x) \\
+                &= \lambda T(x).
+            \end{aligned}
+    \end{equation*}
+    Sledi, da je preslikava $T$ homogena, torej je res linearna. Sedaj si oglejmo jedro te preslikave. Recimo, da za nek
+    $x \in \mathbb{H}$ velja $T(x) = 0$. Potem velja 
+    $$x\alpha - \gamma x = 0$$
+    oziroma
+    $$x\alpha = \gamma x.$$
+    Torej je $x$ v jedru natanko tedaj, ko je $x$ rešitev enačbe $x\alpha = \gamma x$. Recimo sedaj, da obstaja tak
+    $x \neq 0$, ki reši to enačbo. Potem lahko obe strani z desne pomnožimo z $x^{-1}$ in dobimo
+    $$\alpha = x^{-1}\gamma x.$$
+    To pa pomeni, da sta $\alpha$ in $\gamma$ podobna, kar je v nasprotju s predpostavko. Torej je $x = 0$ edina rešitev enačbe
+    $x\alpha = \gamma x$, oziroma $\ker T = \{0\}$. Iz tega pa že sledi, da je $T$ injektivna preslikava, torej ima enačba
+    $x\alpha - \gamma x = \beta$
+    res enlično rešitev v $\mathbb{H}$.
+\end{dokaz}
+
+\begin{opomba}
+    Zgornji izrek velja tudi za splošne obsege. Dokaz lahko najdete v \textcite{johnson}.
+\end{opomba}
+
+\subsection{Alternativna definicija kvaternionov}
+
+Obseg $\mathbb{H}$ lahko definiramo tudi na naslednji način.
+
+\begin{definicija}
+    Definiramo množico
+    $$\mathbb{H}' = \Biggl\{
+        \begin{bmatrix}
+            a & b\\
+            - \overline{b} & \overline{a}
+        \end{bmatrix}
+        ; \, a, b \in \mathbb{C}
+        \Biggr\},$$
+        ki je podmnožica $2 \times 2$ kompleksnih matrik, pri čemer z $\overline{x}$ označujemo konjugirano kompleksno število.
+\end{definicija}
+Da sta definiciji ekvivalentni, se lahko prepričamo z vpeljavo preslikave
+
+\[ \mathscr{M}: \mathbb{H} \rightarrow \mathbb{H}', \]
+\[  x = a + bj \longmapsto x' = 
+    \begin{bmatrix}
+        a & b\\
+        - \overline{b} & \overline{a}
+    \end{bmatrix}.
+\]
+
+\begin{trditev}
+    Množica $\mathbb{H}'$ je obseg in preslikava $\mathscr{M}$ je izomorfizem obsegov $\mathbb{H}$ in $\mathbb{H}'$.
+\end{trditev}
+
+\begin{dokaz}
+    Najprej pokažimo, da je preslikava $\mathscr{M}: \mathbb{H} \rightarrow \mathbb{H}'$ izomorfizem. 
+    Najprej pokažemo, da ohranja seštevanje in množenje.
+    Naj bosta $x = a + bj$ in $y = c + dj$ iz $\mathbb{H}$. Računamo
+    \begin{equation*}\tag{1}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                \mathscr{M}(x + y) &= \mathscr{M}((a + c) + (b + d)j) \\
+                &= \begin{bmatrix}
+                    a + c & b + d\\
+                    - \overline{(b + d)} & \overline{(a + c)}
+                \end{bmatrix} \\
+                &= \begin{bmatrix}
+                    a & b\\
+                    - \overline{b} & \overline{a}
+                \end{bmatrix}
+                +
+                \begin{bmatrix}
+                    c & d\\
+                    - \overline{d} & \overline{c}
+                \end{bmatrix}\\
+                &= \mathscr{M}(a+bj) + \mathscr{M}(c+dj)\\
+                &= \mathscr{M}(x) + \mathscr{M}(y),
+            \end{aligned}
+    \end{equation*} torej $\mathscr{M}$ ohranja seštevanje. Sedaj preverimo, če ohranja tudi množenje. Upoštevamo točko \textit{viii}.\ trditve~\ref{eq1} in dobimo
+    \begin{equation*}\tag{2}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                \mathscr{M}(xy) &= \mathscr{M}((ac - b\overline{d}) + (ad + b\overline{c})j) \\
+                &= \begin{bmatrix}
+                    ac - b\overline{d} & ad + b\overline{c}\\
+                    - \overline{(ad + b\overline{c})} & \overline{(ac - b\overline{d})}
+                \end{bmatrix} \\
+                &= \begin{bmatrix}
+                    ac - b\overline{d} & ad + b\overline{c}\\
+                    - \overline{ad} - \overline{b}c & {\overline{ac} - \overline{b}d}
+                \end{bmatrix}\\
+                &= \begin{bmatrix}
+                    a & b\\
+                    - \overline{b} & \overline{a}
+                \end{bmatrix}
+                \begin{bmatrix}
+                    c & d\\
+                    - \overline{d} & \overline{c}
+                \end{bmatrix}\\
+                &= \mathscr{M}(a+bj)\mathscr{M}(c+dj)\\
+                &= \mathscr{M}(x)\mathscr{M}(y).
+            \end{aligned}\\
+    \end{equation*} Pri tem smo upoštevali, da za kompleksni števili $z,w$ velja $\overline{zw} = \overline{z}\,\overline{w}$.
+    Velja tudi
+    $$\mathscr{M}(1) = 
+    \begin{bmatrix}
+        1 & 0 \\
+        0 & 1
+    \end{bmatrix},$$
+    torej $\mathscr{M}$ ohranja enoto. Sedaj pokažimo še, da je $\mathscr{M}$ bijektivna. Definiramo preslikavo \(\mathscr{N}:\mathbb{H}'\to\mathbb{H}\) s predpisom
+    \[
+    \mathscr{N}\!\left(
+    \begin{bmatrix}
+    a & b\\
+    -\overline{b} & \overline{a}
+    \end{bmatrix}
+    \right)=a+bj.
+    \]
+    Ta preslikava je dobro definirana in velja
+    \(\mathscr{N}\circ\mathscr{M}=\mathrm{id}_{\mathbb{H}}\) and 
+    \(\mathscr{M}\circ\mathscr{N}=\mathrm{id}_{\mathbb{H}'}\), torej je \(\mathscr{M}\) bijektivna. Sledi, da je \(\mathscr{M}\) izomorfizem \(\mathbb{H} \cong \mathbb{H}'\).
+
+    \medskip
+    Sedaj pokažimo še, da je $\mathbb{H}'$ obseg. Iz računov (1) in (2) je razvidno, da je množica $\mathbb{H}'$ zaprta za seštevanje in množenje. Poleg tega
+    velja
+    $$\det 
+    \begin{bmatrix}
+        a & b\\
+        - \overline{b} & \overline{a}
+    \end{bmatrix}
+    = |a|^2 + |b|^2 \geq 0.$$
+    Ta izraz je enak 0 natanko takrat, ko je $a = b = 0$, torej ko je matrika enaka 0. Sledi, da je vsak neničeln element množice $\mathbb{H}'$ obrnljiv. 
+    
+\end{dokaz}
+
+\section{Kvaternionske matrike}
+
+V prostoru matrik nad splošnim obsegom nimamo teorije podobnosti, lastnih vrednostih, trikotnih form ipd.\@ Na polje lahko  
+gledamo kot na \say{najbolj obsežno} algebrsko strukturo, v kateri študiramo lastne vrednosti itd.\@ V tem razdelku bomo poskusili
+lastnosti matrik posplošiti na primer, ko obseg, nad katerim študiramo matrike, ni komutativen. 
+
+\subsection{Osnovne definicije}
+
+Najprej se spoznajmo z definicijo kvaternionske matrike.
+
+\begin{definicija}
+    Naj bo $M_{m \times n}(\mathbb{H})$ množica $m \times n$ matrik z elementi iz obsega kvaternionov. Elementom te 
+    množice pravimo \textbf{kvaternionske matrike}.
+\end{definicija}
+
+\noindent
+Na tej množici poleg navadnega seštevanja in matričnega množenja definiramo še množenje s skalarjem na sledeč način.
+
+\begin{definicija}
+    Naj bo $A = [a_{ij}] \in M_{m \times n}(\mathbb{H})$ in $q \in \mathbb{H}$. \textbf{Levo množenje s skalarjem} definiramo kot
+    $$qA = 
+    \begin{bmatrix}
+        qa_{ij}
+    \end{bmatrix}
+    .$$
+    Analogno definiramo \textbf{desno množenje s skalarjem} kot
+    $$Aq = \begin{bmatrix}
+        a_{ij}q
+    \end{bmatrix}
+    .$$
+\end{definicija}
+
+Ker je množenje v $\mathbb{H}$ asociativno in veljata distributivnostna zakona, je množenje kvaternionskih matrik asociativno. Podobno, ker je $1$ enota za množenje v $\mathbb{H}$,
+je 
+\[I_n =
+\begin{bmatrix}
+1 & 0  & \cdots & 0 \\
+0 & 1  & \cdots & 0 \\
+\vdots & \vdots & \ddots & \vdots \\
+0 & 0  & \cdots & 1
+\end{bmatrix}
+\]
+enota za množenje v $M_{n}(\mathbb{H})$. Enostavno je tudi videti, da za $A \in M_{m \times n}(\mathbb{H}), \, B \in M_{n \times o}(\mathbb{H})$ in $p, q \in \mathbb{H}$ velja
+$$(qA)B = q(AB), \quad
+(Aq)B = A(qB), \quad
+(pq)A = p(qA).$$
+
+\noindent
+Opazimo, da je $M_{m \times n}(\mathbb{H})$ levi oz.\@ desni vektorski prostor nad $\mathbb{H}$, odvisno od definicije množenja s 
+skalarjem. Na tem prostoru lahko izvajamo vse operacije kot na prostoru kompleksnih matrik, razen tistih, pri katerih je vključena komutativnost, npr.
+$$(qA)B \neq A(qB)$$
+v splošnem. Začnimo z nekaj osnovnimi definicijami, ki jih poznamo že iz kompleksnih matrik.
+
+\begin{definicija}
+    Naj bo $A =
+        \begin{bmatrix}
+            a_{ij}
+        \end{bmatrix}
+        \in M_{m \times n}(\mathbb{H})$. \textbf{Konjugirano matriko} matrike $A$ definiramo kot 
+        \[ \overline{A} = 
+        \begin{bmatrix}
+            a_{ij}^{*}
+        \end{bmatrix}, \]
+        \textbf{transponirano matriko} matrike $A$ kot
+        \[ A^{T} =
+        \begin{bmatrix}
+            a_{ji}
+        \end{bmatrix} \]
+        in \textbf{adjungirano matriko} matrike $A$  kot
+        \[ A^{H} = (\overline{A})^{T}. \]
+\end{definicija}
+\begin{definicija}
+    Naj bo $A =
+        \begin{bmatrix}
+            a_{ij}
+        \end{bmatrix}
+        \in M_{n}(\mathbb{H})$ kvadratna matrika. Če za $A$ velja
+        $$AA^{H} = A^{H}A,$$
+        pravimo, da je $A$ \textbf{normalna matrika}. Če zanjo velja
+        $$A^{H} = A,$$
+        pravimo, da je \textbf{hermitska matrika}. Če je
+        $$A^{H}A = I,$$
+        je $A$ \textbf{unitarna matrika}. Če obstaja tak $B \in M_{n}(\mathbb{H})$, da velja
+        $$AB = BA = I,$$
+        pravimo, da je matrika $A$ \textbf{obrnljiva}.
+\end{definicija}
+
+\subsection{Lastnosti kvaternionskih matrik}
+Sedaj si oglejmo nekaj lastnosti kvaternionskih matrik.
+
+\begin{trditev}\label{lastnosti_matrike}
+    Naj bo $A\in M_{m \times n}(\mathbb{H})$  in $B\in M_{n \times p}(\mathbb{H})$. Veljajo naslednje izjave.
+    \begin{enumerate}
+        \item $(\overline{A})^{T} = \overline{(A^{T})}$.
+        \item $(AB)^{H} = B^{H}A^{H}$.
+        \item $(AB)^{-1} = B^{-1}A^{-1}$, če sta $A$ in $B$ obrnljivi.
+        \item $(\overline{A})^{-1} \neq \overline{A^{-1}}$ v splošnem.
+        \item ${(A^{T})}^{-1} \neq {(A^{-1})}^{T}$ v splošnem.
+    \end{enumerate}
+\end{trditev}
+
+\begin{dokaz}
+    Naj bosta $A = 
+        \begin{bmatrix}
+            a_{ij}
+        \end{bmatrix}
+        \in M_{m \times n}(\mathbb{H}),
+        B = 
+        \begin{bmatrix}
+            b_{jk}
+        \end{bmatrix}
+        \in M_{n \times o}(\mathbb{H})$.
+
+    \begin{enumerate}
+        \item Računamo
+        \begin{equation*}
+            (\overline{A})^{T} = 
+                \begin{bmatrix}
+                    a_{ij}^{*}
+                \end{bmatrix}^{T} 
+                = 
+                \begin{bmatrix}
+                    {a_{ji}}^{*} 
+                \end{bmatrix} \\
+                = \overline{
+                \begin{bmatrix}
+                    a_{ji}
+                \end{bmatrix}} \\
+                = \overline{(A^{T})}.
+        \end{equation*}
+
+        \item Upoštevamo točko \textit{iv}.\@ trditve~\ref{eq1} in dobimo
+        \[(AB)^{H} = \bigg[
+                    \sum_{k = 1}^{n} b_{ik}^{*}a_{ji}^{*}
+                    \bigg]
+                    =
+                    B^{H}A^{H}.
+                    \]
+        \item Pokazati moramo, da obstaja matrika $C \in M_{p}(\mathbb{H})$, da velja
+        $$ABC = CAB = I,$$
+        in da je $C = B^{-1}A^{-1}$.
+        Upoštevamo, da je $I$ enota za množenje, in dobimo
+        $$(AB)B^{-1}A^{-1} = A(BB^{-1})A^{-1} 
+        = AIA^{-1} 
+        = AA^{-1} 
+        = I.$$
+        Tudi po drugi strani
+        $$B^{-1}A^{-1}(AB) = B^{-1}(A^{-1}A)B 
+        = BIB^{-1} 
+        = BB^{-1} 
+        = I.$$
+        \item Vzemimo matriko
+    $A = \begin{bmatrix}
+        i & k \\
+        0 & j
+    \end{bmatrix}$
+    z inverzom
+    $A^{-1} = \begin{bmatrix}
+        -i & -1 \\
+        0 & -j
+    \end{bmatrix}$,
+    in recimo, da zanjo velja
+    $(\overline{A})^{-1} = \overline{A^{-1}}$.
+    Potem je 
+    $$I = \overline{A}(\overline{A})^{-1} 
+    = \overline{A} \, \overline{{A}^{-1}} 
+    =
+    \begin{bmatrix}
+        -i & -k \\
+        0 & -j
+    \end{bmatrix}
+    \begin{bmatrix}
+        i & -1 \\
+        0 & j
+    \end{bmatrix} 
+    =
+    \begin{bmatrix}
+        1 & 2i \\
+        0 & 1
+    \end{bmatrix},$$
+    kar je protislovje.
+    \item Naredimo analog dokaza točke \textit{iv}.  
+    \end{enumerate} 
+
+\end{dokaz}
+
+
+
+\subsection{Kompleksna adjungirana matrika}
+
+Pri študiju kvaternionskih matrik se moramo ustaviti že pri zelo osnovnem vprašanju: Če poznamo desni inverz neke matrike, je to tudi njen levi inverz? 
+Natančneje, ali za kvaternionski matriki $A, B$, za kateri velja $AB = I$, velja $BA = I$? Izkaže se, da odgovor na to vprašanje 
+ni tako trivialen, kot bi sprva pričakovali. V pomoč pri reševanju tega problema nam je ideja, da kvaternionsko matriko
+identificiramo s parom kompleksnih matrik. Ta princip je opisan v spodnji definiciji, pred tem pa potrebujemo naslednjo lemo.
+
+\begin{lema}\label{razcep}
+    Vsako kvaternionsko matriko $A \in M_{m \times n}(\mathbb{H})$ se da enolično zapisati kot 
+    $$A = A_{1} + A_{2}j,$$
+    kjer sta $A_{1}, A_{2} \in M_{m \times n}(\mathbb{C})$.
+\end{lema}
+
+\begin{dokaz}
+    Naj bo $A = \big[a_{ij}\big] \in M_{m \times n}(\mathbb{H})$. Po točki \textit{vii}.\ trditve~\ref{eq1} vemo, da lahko $a_{ij} \in \mathbb{H}$ enolično zapišemo kot 
+    $$a_{ij} = b_{ij} + c_{ij}j, \quad b_{ij}, \, c_{ij} \in \mathbb{C}.$$
+    Sledi, da je
+    $$\big[a_{ij}\big] = \big[b_{ij} + c_{ij}j\big] 
+    = \big[b_{ij}\big] + \big[c_{ij}\big]j 
+    = A_{1} + A_{2}j,$$
+    kjer $A_{1}, A_{2} \in M_{m \times n}(\mathbb{C})$. 
+    
+    \medskip
+    Pokažimo še, da je tak zapis enoličen. Recimo, da obstajata še taki $\tilde{A_{1}} = \big[\tilde{b}_{ij}\big], \, \tilde{A_{2}} = \big[\tilde{c}_{ij}\big] \in M_{m \times n}(\mathbb{C})$, 
+    da velja $A = \tilde{A_{1}} + \tilde{A_{2}}j$. Potem bi lahko vsak element $A$ zapisali kot
+    \[ a_{ij} = \tilde{b}_{ij} + \tilde{c}_{ij}j. \]
+    Ker je tak zapis enoličen, sledi $\tilde{b}_{ij} = b_{ij}, \, \tilde{c}_{ij} = c_{ij}$
+    za vse elemente $a_{ij}$ matrike $A$, torej je $\tilde{A_{1}} = A_{1}$ in $\tilde{A_{2}} = A_{2}$.
+\end{dokaz}
+
+\begin{definicija}
+    Za matriko $A = A_{1} + A_{2}j \in M_{n} (\mathbb{H})$, kjer sta $A_{1}, A_{2} \in M_{n} (\mathbb{C})$, je $2n \times 2n$ matrika 
+        $$\chi_{A} = 
+        \begin{bmatrix}
+            A_{1} & A_{2}\\
+            - \overline{A_2} & \overline{A_1}
+        \end{bmatrix} $$
+        \textbf{kompleksna adjungirana matrika} matrike A.
+\end{definicija}
+
+\begin{opomba}
+    Če je $A$ kompleksna matrika, je $A = A_{1}$, torej je njena adjungiranka enaka
+    $$\chi_{A} =
+    \begin{bmatrix}
+        A & 0\\
+        0 & \overline{A}
+    \end{bmatrix}.
+    $$
+\end{opomba}
+
+\begin{zgled}
+    Oglejmo si matriko
+    $
+    P = 
+    \begin{bmatrix}
+        1 & x \\
+        0 & 1
+    \end{bmatrix}
+    $,
+    kjer je $x = x_{0} + x_{1}i + x_{2}j + x_{3}k = (x_{0} + x_{1}i) + (x_{2} + x_{3}i)j$. Potem je
+    $$\chi_{P} = 
+    \begin{bmatrix}
+        1 & x_{0} + x_{1}i & 0 & x_{2} + x_{3}i\\
+        0 & 1 & 0 & 0 \\
+        0 & -x_{2} + x_{3}i & 1 & x_{0} - x_{1}i \\
+        0 & 0 & 0 & 1
+    \end{bmatrix}.
+    $$
+    
+\end{zgled}
+
+\noindent
+Zgornja definicija zelo spominja na alternativno definicijo kvaternionov, pri kateri kvaternion identificiramo z $2\times 2$ 
+kompleksno matriko. Izkaže se, da nas ta ideja vodi do odgovora na vprašanje o levem in desnem inverzu.
+Naslednji izrek potrdi domnevo, da je sta v $M_{n}(\mathbb{H})$ levi in desni inverz matrike enaka.
+
+\begin{izrek}\label{inverz}
+    Naj bosta $A, B \in M_{n} (\mathbb{H})$. Če velja $AB = I$, potem je $BA = I$.
+\end{izrek}
+
+\begin{dokaz}
+    Vemo, da trditev velja za kompleksne matrike.
+    Zapišemo $A = A_{1} + A_{2}j$ in $B = B_{1} + B_{2}j$, kjer so $A_{1}, \, A_{2}, \, B_{1}, \, B_{2} \in M_{n} (\mathbb{C})$.
+    Enakost $AB = I$ 
+    lahko zapišemo kot
+    \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                I &=(A_{1} + A_{2}j)(B_{1} + B_{2}j) \\
+                &= A_{1}B_{1} + A_{1}B_{2}j + A_{2}jB_{1} + A_{2}jB_{2}j \\
+                &= (A_{1}B_{1} - A_{2}\overline{B_{2}})+(A_{1}B_{2} + A_{2}\overline{B_{1}})j.
+            \end{aligned}  
+    \end{equation*} 
+    Pri tem smo upoštevali zvezo $j^2 = -1$ in točko \textit{viii}.\ trditve~\ref{eq1}.
+    Sledi
+    $$A_{1} \, B_{1} - A_{2} \, \overline{B_{2}} = I, \quad A_{1} \, B_{2} + A_{2} \, \overline{B_{1}} = 0.$$
+    To lahko v matrični obliki zapišemo kot
+        $$\big[ \begin{matrix}
+            A_{1} & A_{2}
+        \end{matrix} \big]
+        \begin{bmatrix}
+            B_{1} & B_{2}\\
+            -\overline{B_{2}} & \overline{B_{1}}
+        \end{bmatrix}
+        = 
+        \big[\begin{matrix}
+            I & 0
+        \end{matrix} \big].$$
+    Sledi
+    $$\chi_{A} \chi_{B} =
+    \begin{bmatrix}
+        A_{1} & A_{2} \\
+        -\overline{A_{2}} & \overline{A_{1}}
+    \end{bmatrix}
+    \begin{bmatrix}
+        B_{1} & B_{2}\\
+        -\overline{B_{2}} & \overline{B_{1}}
+    \end{bmatrix} 
+    =
+    \begin{bmatrix}
+        I & 0\\
+        -\overline{A_{2}} \, B_{1} - \overline{A_{1}} \, \overline{B_{2}} & -\overline{A_{2}} \, B_{2} + \overline{A_{1}} \, \overline{B_{1}}
+    \end{bmatrix} 
+    =
+    \begin{bmatrix}
+        I & 0\\
+        0 & I
+    \end{bmatrix}.$$
+    Ker sta $\chi_{A}, \chi_{B}$ kompleksni matriki, velja 
+    \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                \chi_{B} \chi_{A} &=
+                \begin{bmatrix}
+                    B_{1} & B_{2}\\
+                    -\overline{B_{2}} & \overline{B_{1}}
+                \end{bmatrix}
+                \begin{bmatrix}
+                    A_{1} & A_{2} \\
+                    -\overline{A_{2}} & \overline{A_{1}}
+                \end{bmatrix} 
+                =
+                \begin{bmatrix}
+                    I & 0\\
+                    0 & I
+                \end{bmatrix}.
+            \end{aligned}  
+    \end{equation*}
+    Dobimo
+    $$B_{1} \, A_{1} - B_{2} \, \overline{A_{2}} = I, \quad
+                B_{1} \, A_{2} + B_{2} \, \overline{A_{1}} = 0,$$
+    oziroma
+    \begin{equation*}
+        \setlength{\jot}{10pt}
+            \begin{aligned}
+                I &= (B_{1}A_{1} - B_{2}\overline{A_{2}})+(B_{1}A_{2} + B_{2}\overline{A_{1}})j \\
+                &=(B_{1} + B_{2}j)(A_{1} + A_{2}j).
+            \end{aligned}  
+    \end{equation*} 
+    Torej res velja $BA = I$.
+
+\end{dokaz}
+
+
+\begin{trditev}\label{eq5}
+    Naj bosta $A, B \in M_{n}(\mathbb{H})$. Označimo z $I_{n}$ identiteto na prostoru $n \times n$ kvaternionskih matrik. Veljajo naslednje izjave.
+    \begin{enumerate}
+        \item $\chi_{I_{n}} = I_{2n}$.
+        \item $\chi_{AB} = \chi_{A} \chi_{B}$.
+        \item $\chi_{A+B} = \chi_{A} + \chi_{B}$.
+        \item $\chi_{A^{-1}} = (\chi_{A})^{-1}$, če je $A$ obrnljiva.
+        \item $\chi_{A^{H}} = (\chi_{A})^{H}$.
+        \item $\chi_{A}$ je hermitska natanko tedaj, ko je $A$ hermitska.
+        \item $\chi_{A}$ je unitarna natanko tedaj, ko je $A$ unitarna.
+        \item $\chi_{A}$ je normalna natanko tedaj, ko je $A$ normalna.
+    \end{enumerate}
+\end{trditev}
+
+\begin{dokaz}
+    Naj bosta $A = A_{1} + A_{2}j, B = B_{1} + B_{2}j\in M_{n}(\mathbb{H})$, kjer so $A_{1}, A_{2}, B_{1}, B_{2} \in M_{n}(\mathbb{C})$.
+    \begin{enumerate}
+        \item Najprej zapišimo matriko $I_{n}$ kot
+        $I_{n} = I_{n} + 0_{n}j$,
+        pri čemer je $0_{n}$ $n \times n$ ničelna matrika. Sedaj lahko izračunamo
+        $$\chi_{I_{n}} =
+        \begin{bmatrix}
+            I_{n} & 0_{n}\\
+            -\overline{0_{n}} & \overline{I_{n}}
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            I_{n} & 0_{n} \\
+            0_{n} & I_{n}
+        \end{bmatrix} 
+        =I_{2n}.$$
+        \item Po lemi \ref{razcep} lahko matriko $AB$ zapišemo kot
+        \begin{equation*}
+            \setlength{\jot}{10pt}
+                \begin{aligned}
+                    AB &= (A_{1} + A_{2}j)(B_{1} + B_{2}j) \\
+                    &= (A_{1}B_{1} - A_{2}\overline{B_{2}})+(A_{1}B_{2} + A_{2}\overline{B_{1}})j.
+                \end{aligned}  
+        \end{equation*}
+        Sedaj računamo 
+        \begin{equation*}
+            \setlength{\jot}{10pt}
+                \begin{aligned}
+                    \chi_{AB} &= 
+                    \begin{bmatrix}
+                        A_{1}B_{1} - A_{2}\overline{B_{2}} & A_{1}B_{2} + A_{2}\overline{B_{1}} \\
+                        - \overline{(A_{1}B_{2} + A_{2}\overline{B_{1}})} & \overline{A_{1}B_{1} - A_{2}\overline{B_{2}}}
+                    \end{bmatrix} \\
+                    &=
+                    \begin{bmatrix}
+                        A_{1}B_{1} - A_{2}\overline{B_{2}} & A_{1}B_{2} + A_{2}\overline{B_{1}} \\
+                        - \overline{A_{1}B_{2}} - \overline{A_{2}}B_{1} & \overline{A_{1}B_{1}} - \overline{A_{2}}B_{2}
+                    \end{bmatrix} \\
+                    &= 
+                    \begin{bmatrix}
+                        A_{1} & A_{2} \\
+                        -\overline{A_{2}} & \overline{A_{1}}
+                    \end{bmatrix} 
+                    \begin{bmatrix}
+                        B_{1} & B_{2}\\
+                        -\overline{B_{2}} & \overline{B_{1}}
+                    \end{bmatrix} \\
+                    &= \chi_{A} \chi_{B}.
+                \end{aligned}  
+        \end{equation*}
+        \item Podobno kot zgoraj zapišimo matriko $A + B$ kot
+        \begin{equation*}
+            \setlength{\jot}{10pt}
+                \begin{aligned}
+                    A + B &= (A_{1} + A_{2}j) + (B_{1} + B_{2}j) \\
+                    &= (A_{1} + B_{1}) + (A_{2} + B_{2})j.
+                \end{aligned}  
+        \end{equation*}
+        Sledi
+        \begin{equation*}
+            \setlength{\jot}{10pt}
+                \begin{aligned}
+                    \chi_{A+B} &= 
+                    \begin{bmatrix}
+                        A_{1} + B_{1} &  A_{2} + B_{2}\\
+                        - (\overline{A_{2} + B_{2}}) & \overline{A_{1} + B_{1}}
+                    \end{bmatrix} \\
+                    &=
+                    \begin{bmatrix}
+                        A_{1} + B_{1} & A_{2} + B_{2} \\
+                        - \overline{A_{2}} - \overline{B_{2}} & \overline{A_{1}} + \overline{B_{1}}
+                    \end{bmatrix} \\
+                    &= 
+                    \begin{bmatrix}
+                        A_{1} & A_{2} \\
+                        -\overline{A_{2}} & \overline{A_{1}}
+                    \end{bmatrix} 
+                    +
+                    \begin{bmatrix}
+                        B_{1} & B_{2}\\
+                        -\overline{B_{2}} & \overline{B_{1}}
+                    \end{bmatrix} \\
+                    &= \chi_{A} + \chi_{B}.
+                \end{aligned}  
+        \end{equation*}
+        \item Naj bo $A$ obrnljiva. Ker velja
+        \[
+        A\,A^{-1}=I_n \quad\text{in}\quad A^{-1}A=I_n,
+        \]
+        uporabimo točki \textit{i}.\@ in \textit{ii}.\@ ter dobimo
+        \[
+        \chi_A\,\chi_{A^{-1}}
+        =\chi_{A A^{-1}}
+        =\chi_{I_n}
+        =I_{2n},
+        \]
+        in
+        \[
+        \chi_{A^{-1}}\,\chi_A
+        =\chi_{A^{-1}A}
+        =\chi_{I_n}
+        =I_{2n}.
+        \]
+        
+        Torej je $\chi_{A^{-1}}$ hkrati levi in desni inverz matrike $\chi_A$, zato
+        \[
+        \chi_{A^{-1}}=(\chi_A)^{-1}.
+        \]
+        \item Najprej izračunajmo
+        $$A^{H} = (A_{1} + A_{2}j)^{H} 
+                    = (A_{1})^{H} + (A_{2}j)^{H}. $$
+        Sedaj upoštevamo točko \textit{iv}.\ trditve~\ref{eq1}, da dobimo
+        \begin{equation*}
+            \setlength{\jot}{10pt}
+                \begin{aligned}
+                    A^{H} &= A_{1}^{H} + j^{*} A_{2}^{H} \\
+                    &= A_{1}^{H} - j A_{2}^{H} \\
+                    &= A_{1}^{H} - A_{2}^{T} j.
+                \end{aligned}  
+        \end{equation*}
+        Zadnja enakost velja po točki \textit{viii}.\ trditve~\ref{eq1}. Sedaj lahko zapišemo
+        $$\chi_{A^{H}} = 
+        \Bigg[\begin{matrix}
+            A_{1}^{H} &  - A_{2}^{T} \\
+            \overline{A_{2}^{T}} & \overline{A_{1}^{H}}
+        \end{matrix}\Bigg] \\
+        = 
+        \begin{bmatrix}
+            A_{1}^{H} & - \overline{A_{2}}^{H} \\
+            A_{2}^{H} & \overline{A_{1}}^{H}
+        \end{bmatrix} \\
+        =
+        \Bigg[\begin{matrix}
+            A_{1} & A_{2} \\
+            - \overline{A_{2}} & \overline{A_{1}}
+        \end{matrix}\Bigg]^{H} \\
+        = (\chi_{A})^{H}.$$
+        \item Recimo, da je $A$ hermitska, torej je
+        $A = A^{H}$.
+        Potem po točki \textit{v.} velja
+        $$\chi_{A} = \chi_{A^{H}} = \chi_{A}^{H},$$
+        torej je tudi $\chi_{A}$ hermitska. Še obratno, naj bo $\chi_{A}$ hermitska, torej
+        $\chi_{A} = \chi_{A}^{H}$.
+        To je po točki \textit{v.} enako
+        $$\chi_{A} = \chi_{A^{H}}.$$
+        Sledi
+        $A^{H} = A$,
+        torej je A hermitska.
+        \item Analog dokaza točke \textit{vi}, uporabimo točki \textit{ii}.\ in \textit{v}.
+        \item Analog dokaza točke \textit{vi}, uporabimo točko \textit{v}.
+    \end{enumerate}
+\end{dokaz}
+
+\section{Lastne vrednosti kvaternionskih matrik}
+V tem razdelku se bomo posvetili lastnim vrednostim kvaternionskih matrik. Ker je množenje kvaternionskih matrik nekomutativno,
+moramo enačbi $Ax = \lambda x$ in $Ax = x \lambda$ obravnavati ločeno.
+
+\begin{definicija}
+    Naj bo $A \in M_{n} (\mathbb{H})$ in $\lambda \in \mathbb{H}$. Če za nek $x \in \mathbb{H}^{n}\setminus\{0\}$ velja
+    \[ Ax = \lambda x, \]
+    pravimo, da je $\lambda$ \textbf{leva lastna vrednost} matrike $A$. Če za nek $x \in \mathbb{H}^{n}\setminus\{0\}$ velja
+    \[ Ax = x \lambda, \]
+    pravimo, da je $\lambda$ \textbf{desna lastna vrednost} matrike $A$. Množico
+    \[ \sigma_{\ell}(A) = \{\lambda \in \mathbb{H} \mid \exists \, x \in \mathbb{H}^{n}\setminus \{0\}: Ax = \lambda x \} \]
+    imenujemo \textbf{levi spekter} matrike $A$, množico
+    \[ \sigma_{r}(A) = \{\lambda \in \mathbb{H} \mid \exists \, x \in \mathbb{H}^{n}\setminus \{0\}: Ax = x \lambda \} \]
+    pa imenujemo \textbf{desni spekter} matrike $A$.
+\end{definicija}
+
+
+\begin{zgled}
+    \begin{enumerate}
+        \item Za matriko
+        $
+        A =
+        \begin{bmatrix}
+            1 & 0\\
+            0 & i
+        \end{bmatrix}
+        $ velja $\sigma_{\ell}(A) = \{1, i\}$ in $\sigma_{r}(A) = \{1\} \cup \left[i\right]$.
+        Preverimo, da so to res leve lastne vrednosti za $A$.
+        Naj bo $x = \begin{bmatrix}x_1 \\ x_2\end{bmatrix} \in \mathbb{H}^2$.
+        Oglejmo si
+        \[
+        Ax = \begin{bmatrix}x_1 \\ i x_2\end{bmatrix}, \quad
+        \lambda x = \begin{bmatrix}\lambda x_1 \\ \lambda x_2\end{bmatrix},
+        \]
+        torej velja
+        $$x_1 = \lambda x_1, \quad
+                    i x_2 = \lambda x_2.$$
+        Zanima nas, za katere $\lambda \in \mathbb{H}$ obstaja $x \in \mathbb{H}^2 \setminus \{0\}$, da sta ti dve enačbi izpolnjeni.
+        Iz prve enačbe dobimo $\lambda = 1$, iz druge pa $\lambda = i$.
+        Sedaj preverimo še desne lastne vrednosti za $A$. Za $x = \begin{bmatrix}x_1 \\ x_2\end{bmatrix} \in \mathbb{H}^2$ velja
+        \[
+        Ax = \begin{bmatrix}x_1 \\ i x_2\end{bmatrix}, \quad
+        x \lambda = \begin{bmatrix} x_1 \lambda\\  x_2 \lambda \end{bmatrix}.
+        \]
+        Sledi
+        $$x_1 = x_1 \lambda, \quad
+        ix_2 = x_2 \lambda.$$
+        Spet iščemo take $\lambda \in \mathbb{H}$, za katere obstaja $x \in \mathbb{H}^2 \setminus \{0\}$, da sta ti dve enačbi izpolnjeni.
+        Iz prve enačbe dobimo $\lambda = 1$. Če predpostavimo $x_2 \neq 0$, pa dobimo $\lambda = x_2^{-1}ix_2$. Desne lastne vrednosti matrike $A$
+        so torej $1$ in $[i]$.
+        
+
+        \item Matrika
+        $A =
+        \begin{bmatrix}
+            0 & i\\
+            j & 0
+        \end{bmatrix}
+        $
+        ima lastne vrednosti $\sigma_{\ell}(A) = \{\frac{1}{\sqrt{2}}(i + j), - \frac{1}{\sqrt{2}}(i + j)\}$ in $\sigma_{r}(A) = \{\lambda \in \mathbb{H}: \: \lambda^4 + 1 = 0\}$.
+        Preverimo najprej, da so to res leve lastne vrednosti za $A$. Naj bo $x = \begin{bmatrix}x_1 \\ x_2\end{bmatrix} \in \mathbb{H}^2$.
+        Izračunamo
+        \[
+        A x 
+        =
+        \begin{bmatrix}
+        i x_2 \\ j x_1
+        \end{bmatrix},
+        \quad
+        \lambda x =
+        \begin{bmatrix}
+        \lambda x_1 \\ \lambda x_2
+        \end{bmatrix}.
+        \]
+        Sledi
+        $$i x_2 = \lambda x_1, \quad
+                j x_1 = \lambda x_2.$$
+        Prvi izraz zapišemo kot
+        $
+        x_2 = -i \lambda x_1
+        $
+        in ga vstavimo v drugega:
+        \[
+        j x_1 = \lambda x_2 = \lambda(- i \lambda x_1) = -\lambda i \lambda x_1.
+        \]
+        Zanima nas, za katere $\lambda$ obstaja $x \neq 0$, da zgornji izraz velja. Tako dobimo pogoj
+        \begin{equation}\tag{1}
+            j = -\lambda i \lambda.
+        \end{equation}
+        To enačbo moramo rešiti za $\lambda \in \mathbb{H}$.  
+        Enačbo (1) z desne pomnožimo z $i$, da dobimo
+        \begin{equation*}
+            \setlength{\jot}{10pt}
+            \begin{aligned}
+                0 &= 2ab, \\
+                0 &= -a^2 + b^2 -c^2 -d^2, \\
+                1 &= 2bc, \\
+                0 &= 2bd.
+            \end{aligned}
+        \end{equation*}
+        Rešitev tega sistema je $a = d = 0$, $b = c = \pm \frac{1}{\sqrt{2}}$, torej sta iskani lastni vrednosti enaki
+        $\lambda = \pm \frac{1}{\sqrt{2}}(i + j)$.
+        Poiščimo še desne lastne vrednosti za $A$.
+        Naj bo $x=\begin{bmatrix}x_1\\x_2\end{bmatrix} \in \mathbb{H}^{2}$. Izračunamo
+        \[
+        A x 
+        =
+        \begin{bmatrix}
+        i x_2 \\ j x_1
+        \end{bmatrix},
+        \quad
+        x \lambda =
+        \begin{bmatrix}
+        x_1 \lambda \\ x_2 \lambda
+        \end{bmatrix}
+        \]
+        in dobimo
+        \[
+        i x_2 = x_1\lambda,\quad j x_1 = x_2\lambda. 
+        \]
+        Prvi izraz lahko zapišemo kot
+        $
+        x_2 = i^{-1} x_1\lambda = -i x_1\lambda 
+        $
+        in ga vstavimo v drugi izraz, da dobimo
+        \[
+        j x_1 = x_2\lambda = (-i x_1\lambda)\lambda = -i x_1\lambda^2.
+        \]
+        Če predpostavimo $x_1 \neq 0$, to lahko zapišemo kot
+        $$
+        \lambda^2 = x_1^{-1}k\,x_1.
+        $$
+        Velja torej \(\lambda^2 \sim k\). Sledi
+        \[
+        \lambda^4 = \big(x_1^{-1}k x_1\big)^2 = x_1^{-1}k^2 x_1 = x_1^{-1}(-1)x_1 = -1.
+        \]
+        S tem smo pokazali, da vsaka desna lastna vrednost \(\lambda\) matrike $A$ zadošča pogoju \(\lambda^4+1=0\). Če pokažemo še, da je
+        vsak $\lambda \in \mathbb{H}$, ki reši enačbo $\lambda^4+1=0$, desna lastna vrednost za $A$, smo s tem dobili vse desne lastne vrednosti
+        matrike $A$. Denimo sedaj, da je $\lambda \in \mathbb{H}$ tak, da velja $\lambda^4+1=0$.
+        Pišimo \(u:=\lambda^2\). Potem je \(u^2=-1\), torej je \(u\) enotski strogo imaginarni kvaternion, tj.\ element oblike
+        $$u=bi+cj+dk, \quad \sqrt{b^2 + c^2 + d^2} = 1.$$
+        Po lemi~\ref{pod} vemo, da so kvaternioni tega tipa podobni, torej del istega ekvivalenčnega razreda. Posebej to pomeni, da obstaja tak \(x_1 \in 
+        \mathbb{H}\setminus\{0\}\), da velja
+        \[
+        x_1^{-1}k x_1 = u.
+        \]
+        Sedaj definiramo
+        $
+        x_2 := -i x_1\lambda.
+        $
+        Sledi
+        \[
+        i x_2 = i(-i x_1\lambda) = x_1\lambda
+        \]
+        in z upoštevanjem \(u=x_1^{-1}k x_1\) dobimo
+        \[
+        x_2\lambda = -i x_1\lambda^2 = -i x_1 u = -i x_1(x_1^{-1}k x_1) = -i k x_1 = j x_1.
+        \]
+        Iz tega pa sledi, da je \(x= \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \neq 0\) lastni vektor
+        za \(\lambda\). Torej je vsak \(\lambda\), za katerega velja \(\lambda^4+1=0\), desna lastna vrednost za $A$.
+        \item Naj bo
+        $A =
+            \begin{bmatrix}
+                0 & i \\
+                -i & 0
+            \end{bmatrix}
+        $.
+        Potem je $\lambda = k$ leva lastna vrednost matrike $A$ z lastnim vektorjem $x= \begin{bmatrix} 1 \\ j \end{bmatrix}$. Velja namreč
+        \begin{equation*}
+            Ax =
+            \begin{bmatrix}
+                0 & i \\
+                -i & 0
+            \end{bmatrix}
+            \begin{bmatrix}
+                1 \\
+                j
+            \end{bmatrix}
+            =
+            \begin{bmatrix}
+                k \\
+                -i
+            \end{bmatrix} 
+            =
+            k
+            \begin{bmatrix}
+                1 \\
+                j
+            \end{bmatrix}
+            =
+            \lambda x.
+        \end{equation*}
+        Recimo, da je $k$ tudi desna lastna vrednost matrike $A$. Potem obstaja tak 
+        \(x= \begin{bmatrix} x_1 \\ x_2 \end{bmatrix} \neq 0\), da velja
+        $Ax = xk$
+        oziroma
+        $$i x_2 = x_1 k, \quad
+                -i x_1 = x_2 k.$$
+        Iz tega sledi
+        $$-i(-ix_2k) = -x_2 k = x_2 k,$$
+        zato $x_2 = x_1 = 0$, kar je v protislovju s predpostavko. Velja torej, da je $k$ leva lastna vrednost matrike $A$, ne pa tudi desna.
+    \end{enumerate}
+\end{zgled}
+
+Iz zgornjega zgleda vidimo, da iskanje levih in desnih lastnih vrednosti ni trivialna naloga. V splošnem nimamo povezave
+med levimi in desnimi lastnimi vrednostmi, opazimo pa zanimivo lastnost desnih lastnih vrednosti. 
+
+\begin{lema}\label{desne lastne vrednosti}
+    Naj bo $\lambda \in \mathbb{H}$ desna lastna vrednost matrike $A$. Potem so 
+    tudi vsi elementi v $[\lambda]$ desne lastne vrednosti za $A$.
+\end{lema}
+
+\begin{dokaz}
+    Če velja
+    $Ax = x \lambda$,  
+    sledi 
+    $$A(xq) = (Ax)q = x\lambda q = (xq)(q^{-1}\lambda q)$$
+    za vsak $q \neq 0$, torej je tudi $q^{-1}\lambda q$ desna lastna vrednost.
+\end{dokaz}
+
+\begin{trditev}
+    Če je $A \in M_{n}(\mathbb{R})$ realna matrika, potem leve in desne lastne vrednosti $A$ sovpadajo, tj.
+    \[\sigma_{\ell}(A) = \sigma_{r}(A).\]
+\end{trditev}
+
+\begin{dokaz}
+    Naj bo $\lambda$ leva lastna vrednost $A$, torej $Ax = \lambda x$ za nek $x \neq 0$. Za vsak $q \in \mathbb{H}$, $q \neq 0$, velja
+    \[(qAq^{-1})qx = (q\lambda q^{-1})qx\]
+    in
+    \[Aqx = (q\lambda q^{-1})qx,\]
+    saj je $A$ realna matrika. Po lemi~\ref{ekvivalencni_razred} vemo, da obstaja $q \in \mathbb{H}$ tak, da je $q\lambda q^{-1}$ kompleksno število. Pišimo
+    $qx = y = y_{1} + y_{2}j, \;  y_{1}, y_{2} \in \mathbb{C}^{n}$.
+    Sledi
+    \[Aqx = A(y_{1} + y_{2}j) = Ay_{1} + Ay_{2}j.\]
+    To lahko dalje pišemo kot
+    \[(q\lambda q^{-1})(y_{1} + y_{2}j) = \underbrace{(q\lambda q^{-1})}_{\in \mathbb{C}} \underbrace{y_{1}}_{\in \mathbb{C}} + \underbrace{(q\lambda q^{-1})}_{\in \mathbb{C}}\underbrace{y_{2}}_{\in \mathbb{C}}j,\]
+    torej je 
+    $Ay_{1} = y_{1}(q\lambda q^{-1})$ in $Ay_{2} = y_{2}(q\lambda q^{-1})$.
+    Iz tega sledi, da je $q\lambda q^{-1}$ desna lastna vrednost matrike $A$, po lemi~\ref{desne lastne vrednosti} pa velja, da je tudi
+    $\lambda$ desna lastna vrednost $A$. Na podoben način pokažemo tudi, da je vsaka desna lastna 
+    vrednost matrike $A$ hkrati tudi njena leva lastna vrednost.
+\end{dokaz}
+
+Iz leme~\ref{desne lastne vrednosti} in opombe~\ref{neskoncno_mnogo_el} sledi, da ima kvaternionska matrika $A$ končno mnogo desnih lastnih vrednosti natanko tedaj, ko so
+vse njene desne lastne vrednosti realne. Naslednja lema opisuje odnos med lastnimi vrednostmi kvaternionske matrike 
+in njene kompleksne adjungiranke.
+
+\begin{lema}\label{lastne vrednosti konjugiranke}
+    Naj bo $\lambda \in \mathbb{H}$ desna lastna vrednost matrike $A \in M_{n}(\mathbb{H})$. Potem sta $\mu = \mathrm{Re} \: \lambda \pm 
+    |\mathrm{Im} \: \lambda| \, i$ lastni vrednosti matrike $\chi_A$.
+\end{lema}
+
+\begin{dokaz}
+    Naj bosta $A \in M_{n}(\mathbb{H})$ in $x \in \mathbb{H}^{n}$. Pišimo $A = A_1 + A_2j$ in $x = x_1 + x_2j$, kjer so 
+    $A_1, A_2 \in M_{n}(\mathbb{C}), \: x_1, x_2 \in \mathbb{C}^n$. Naj bo $\lambda \in \mathbb{H}$ desna lastna vrednost
+    za $A$ z lastnim vektorjem $x$. Iz leme~\ref{desne lastne vrednosti} vemo, da so potem tudi vsi elementi iz $[\lambda]$ desne lastne vrednosti
+    za $A$. Naj bo $\mu$ kompleksno število iz $[\lambda]$.
+    Enačbo $Ax = x\mu$ lahko zapišemo kot
+    $$(A_1 + A_2j)(x_1 + x_2j) = (x_1 + x_2j)\mu,$$
+    kar je enako
+    $$A_1x_1 + A_1x_2j + A_2jx_1 + A_2jx_2j = x_1\mu + x_2j\mu.$$
+    Sedaj upoštevamo zvezo $j^2 = -1$ in točko \textit{viii}.\ trditve \ref{eq1}, da dobimo
+    $$(A_1x_1 - A_2\overline{x_2}) + (A_1 x_2 + A_2 \overline{x_1})j = x_1 \mu + x_2 \overline{\mu}j.$$
+    Tako dobimo zvezi
+    $$A_1x_1 - A_2\overline{x_2} = x_1 \mu, \quad
+            A_1 x_2 + A_2 \overline{x_1} = x_2 \overline{\mu}.$$
+    Naj bo sedaj $v = 
+    \begin{bmatrix}
+        x_1\\
+        - \overline{x_2}
+    \end{bmatrix}
+    \in \mathbb{C}^2$. Računamo 
+    \begin{equation*}
+        \setlength{\jot}{10pt}
+        \begin{aligned}
+            \chi_A \, v =
+            \begin{bmatrix}
+                A_{1} & A_{2}\\
+                - \overline{A_{2}} & \overline{A_{1}} 
+            \end{bmatrix}
+            \Bigg[\begin{matrix}
+                x_1\\
+                - \overline{x_2}
+            \end{matrix}\Bigg]
+            &= 
+            \Bigg[\begin{matrix}
+                A_1x_1 - A_2\overline{x_2}\\
+                - \overline{A_2} x_1 - \overline{A_1} \overline{x_2}
+            \end{matrix}\Bigg]
+            &=
+            \Bigg[\begin{matrix}
+                A_1x_1 - A_2\overline{x_2}\\
+                - \overline{(A_1 x_2 + A_2 \overline{x_1})}
+            \end{matrix}\Bigg].
+        \end{aligned}
+    \end{equation*}
+    Sedaj upoštevamo zgornji zvezi in dobimo
+    \begin{equation*}
+        \chi_A \, v =
+        \begin{bmatrix}
+            x_1 \mu \\
+            - \overline{(x_2 \overline{\mu})}
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            x_1 \\
+            - \overline{x_2}
+        \end{bmatrix}    
+        \mu
+        =\mu \, v,
+    \end{equation*}
+    torej je $\mu$ lastna vrednost za $\chi_A$. Dejstvo, da je $\mu = \mathrm{Re} \: \lambda \pm |\mathrm{Im} \: \lambda| \, i$, sledi 
+    iz leme~\ref{pod}.
+\end{dokaz}
+
+\begin{opomba}\label{lastna vrednost adjungiranke}
+    Iz zgornjega dokaza vidimo, da velja še več: če je $\lambda$ lastna vrednost za $\chi_A$,
+    potem je $\lambda$ tudi desna lastna vrednost za $A$.
+\end{opomba}
+
+\begin{izrek}\label{zgornje trikotna}
+    Naj bo $A \in M_{n}(\mathbb{H})$. Obstaja taka unitarna matrika $U \in M_{n}(\mathbb{H})$, da je matrika
+    $U^{H}AU$ zgornje trikotna, tj.\ vsi elementi pod diagonalo so enaki 0.
+\end{izrek}
+
+Za dokaz tega izreka bomo potrebovali naslednji lemi.
+
+\begin{lema}\label{nenicelna resitev}
+    Naj bo $A \in M_{m \times n}(\mathbb{H})$, $m < n$. Potem ima enačba $Ax = 0$ neničelno rešitev.
+\end{lema}
+
+\begin{dokaz}
+    Pišimo $A = A_1 + A_2j$ in $x = x_1 + x_2j$, kjer so 
+    $A_1, A_2 \in M_{n}(\mathbb{C}), \: x_1, x_2 \in \mathbb{C}^n$. Enačbo $Ax = 0$ zapišemo v obliki
+    $$\begin{bmatrix}
+        A_{1} & A_{2}\\
+        - \overline{A_{2}} & \overline{A_{1}} 
+    \end{bmatrix}
+    \Bigg[\begin{matrix}
+        x_1\\
+        - \overline{x_2}
+    \end{matrix}\Bigg]
+    = 0.$$
+    Ker je $2m < 2n$, ima ta enačba neničelno rešitev.
+\end{dokaz}
+
+\begin{lema}\label{onb}
+    Naj bo $u_1 \in \mathbb{H}^n$ enotski vektor. Obstajajo enotski vektorji $u_2, \ldots, u_n \in \mathbb{H}^n$, $n \geq 2$, da je
+    $$\{u_1, u_2, \ldots, u_n\}$$
+    ortonormirana množica, tj.\ velja
+    $$u_i^* u_j = 
+    \begin{cases}
+        1 \: ; & i = j \\
+        0 \: ; & i \neq j
+    \end{cases}$$
+    za vse $i, j = 1, \ldots, n$.
+\end{lema}
+
+\begin{dokaz}
+    Naj bo $u_1 \in \mathbb{H}^n$ enotski vektor. Želimo najti enotski vektor $u_2 \in \mathbb{H}^n$, ki je pravokoten
+    na $u_1$. Recimo, da je $A = u_i^*$ kvaternionska matrika velikosti $1 \times n$. Iščemo $x \neq 0$, da bo
+    $$Ax = u_i^*x = 0.$$
+    Ker je $A$ velikosti $1 \times n$ in velja $1 < n$, po lemi~\ref{nenicelna resitev} obstaja $x \neq 0$, ki reši
+    to enačbo. Ta $x$ normiramo in dobimo $u_2$. Trditev torej velja za $n=2$.
+    Denimo sedaj, da imamo ortonormirano množico $\{u_1, u_2, \ldots, u_k\}, \: k < n$. Sestavimo matriko $A$, ki naj ima za vrstice
+    vektorje $u_1^*, u_2^*, \ldots, u_k^*$. Ta matrika je velikosti $k \times n$. Spet iščemo tak $x \in \mathbb{H}^{n}$,
+    za katerega bo veljalo
+    $$Ax = 0$$
+    oziroma
+    $$u_1^*x = 0, \:
+    u_2^*x = 0, \:
+    \ldots, \:
+    u_k^*x = 0.$$
+    Ker velja $k<n$, po lemi~\ref{nenicelna resitev} tak $x \neq 0$ obstaja. To rešitev normiramo in dobimo $u_{k+1}$. 
+    Postopek ponavljamo, dokler ne dobimo vseh $n$ elementov ortonormirane množice.
+\end{dokaz}
+
+Sedaj se lahko lotimo dokaza izreka~\ref{zgornje trikotna}.
+
+\begin{dokaz}
+    Naj bo $A \in M_{n}(\mathbb{H})$. Dokaz poteka z indukcijo na $n$. Za $n = 1$ trditev očitno velja.
+    Denimo sedaj, da trditev velja za matrike velikosti $(n-1)\times(n-1)$. Naj bo $u_1$ lastni vektor matrike $A$, 
+    $\lVert u_1 \rVert = 1$, za desno lastno vrednost $\lambda_1$. Pri tem z $\lVert \cdot \rVert$ označujemo evklidsko 
+    normo kvaternionskega vektorja. Lema~\ref{onb} zagotavlja, da obstajajo enotski vektorji $u_2, 
+    \ldots, u_n$, da je $\{u_1, u_2,\ldots, u_n\}$ ortonormirana množica. Definiramo unitarno matriko $U_n$ kot
+    \begin{equation*}
+        U_n =
+        \Bigg[\begin{matrix}
+            u_1 & u_2 & \cdots & u_n
+        \end{matrix}\Bigg]
+        =
+        \Bigg[\begin{matrix}
+            u_1 & U_{n-1}
+        \end{matrix}\Bigg].
+    \end{equation*}
+    Oglejmo si
+    \begin{equation*}
+        A \, U_n =
+        \Bigg[\begin{matrix}
+            A \, u_1 & A \, U_{n-1} 
+        \end{matrix}\Bigg]
+        =
+        \Bigg[\begin{matrix}
+            u_1\lambda_1 & A \, U_{n-1}
+        \end{matrix}\Bigg].
+    \end{equation*}
+    Enačbo sedaj pomnožimo z leve z $U_n^H$ in dobimo
+    \begin{equation*}
+        U_n^H \, A \, U_n = 
+        \Bigg[\begin{matrix}
+           u_1^* \\
+           U_{n-1}^H 
+        \end{matrix}\Bigg]
+        \Bigg[\begin{matrix}
+            u_1\lambda_1 & A \, U_{n-1}
+        \end{matrix}\Bigg]
+        =
+        \begin{bmatrix} 
+            \lambda_1 & {u^*_1} \, A \,U_{n-1} \\
+            \vdots & U_{n-1}^H \, A \, U_{n-1}   \\
+            0      &                 &   \\ 
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            \lambda_1 & \times \cdots \times \\
+            \vdots & A_{n-1} \\
+            0 &
+        \end{bmatrix}.
+    \end{equation*}
+    Po indukcijski predpostavki obstaja $\widetilde{U}_{n-1} \in M_{n-1}(\mathbb{H})$ unitarna, da je matrika
+    $$T := \widetilde{U}_{n-1}^H \, A_{n-1} \, \widetilde{U}_{n-1} $$ 
+    zgornje trikotna. Če sedaj definiramo
+    $$U = U_n
+    \begin{bmatrix} 
+        1      &\cdots           & 0 \\
+        \vdots & \tilde{U}_{n-1} &   \\
+        0      &                 &   \\ 
+    \end{bmatrix},
+    $$
+    sledi
+    \begin{equation*}
+        U^H \, A \, U = 
+        \begin{bmatrix}
+            1 & \cdots &  0 \\
+            \vdots  &\widetilde{U}^H_{n-1} &\\
+            0 & &\\
+        \end{bmatrix}
+        \begin{bmatrix}
+            \lambda_1 & \times \cdots \times \\
+            \vdots & A_{n-1} \\
+            0 &
+        \end{bmatrix}
+        \begin{bmatrix}
+            1 & \cdots &  0 \\
+            \vdots  &\widetilde{U}_{n-1} &\\
+            0 & &\\
+        \end{bmatrix}\\
+        =
+        \begin{bmatrix}
+            \lambda_1 & \times \cdots \times \\
+            \vdots & T \\
+            0 &
+        \end{bmatrix},
+    \end{equation*}
+   torej res velja, da je matrika $U^{H}AU$ zgornje trikotna.
+\end{dokaz}
+
+Naslednji izrek opisuje zanimivo lastnost kompleksnih lastnih vrednosti kvaternionske matrike.
+
+\begin{trditev}\label{standardne}
+    Vsaka matrika $A \in M_{n}(\mathbb{H})$ ima natanko $n$ desnih lastnih vrednosti oblike
+    $$\mu = a + bi, \: b \geq 0.$$
+\end{trditev}
+
+\begin{dokaz}
+    Naj bo $A \in M_{n}(\mathbb{H})$. Recimo, da je $\lambda \in \mathbb{H} \setminus \mathbb{R}$ desna lastna vrednost za 
+    $A$. Če upoštevamo lemi~\ref{desne lastne vrednosti} in~\ref{pod}, sledi, da sta potem tudi $\mu = \mathrm{Re} \: \lambda + |\mathrm{Im} \: \lambda| \, i, \, \overline{\mu} = \mathrm{Re} \: \lambda - |\mathrm{Im} \: \lambda| \, i \in 
+    \mathbb{C}$ desni lastni vrednosti za $A$. Za vsako desno lastno vrednost matrike $A$, ki ni iz $\mathbb{R}$, dobimo torej konjugiran par kompleksnih števil, ki
+    je tudi v desnem spektru matrike $A$. Hkrati pa po lemi~\ref{lastne vrednosti konjugiranke} vemo, da so ti pari tudi lastne vrednosti
+    za $\chi_A$. Ostane nam pokazati še, da imajo realne lastne vrednosti matrike $\chi_A$ sodo kratnost.
+
+    \medskip
+    To pokažemo z indukcijo na $n$. Za $n = 1$ trditev velja. Naj bo $n \geq 2$ in naj indukcijska predpostavka velja za matrike velikosti $2(n-1) \times 2(n-1)$. Pokazati hočemo, da 
+    predpostavka velja za matrike velikosti $2n \times 2n$. Naj bo $a \in \mathbb{R}$ lastna vrednost za $A$, torej
+    $Ax = ax = xa$ za nek enotski vektor $x\in \mathbb{H}^n \setminus \{0\}$. Po lemi~\ref{onb} vemo, da obstajajo $u_2, \ldots , u_n$, da je
+    $$U =
+    \Bigg[\begin{matrix}
+        x & u_2 & \cdots & u_n
+    \end{matrix}\Bigg]
+    $$
+    unitarna matrika. Označimo
+    $$U^H A U = 
+    \begin{bmatrix}
+        a & \alpha ^T \\
+        0 & B
+    \end{bmatrix},
+    $$
+    pri čemer je $B = B_1 + B_2 j \in M_{n-1}(\mathbb{H})$ in $\alpha = \alpha_1 + \alpha_2 j \in \mathbb{H}^{n-1}$. Oglejmo si matriko
+    \begin{equation*}\tag{1}
+        \chi_{(U^H A U)} =  
+        \begin{bmatrix}
+            a & \alpha_1^T & 0 & \alpha_2^T \\
+            0 & B_1 & 0 & B_2 \\
+            0 & - \overline{\alpha_2}^T & a & \overline{\alpha_1}^T \\
+            0 & - \overline{B_2} & 0 & \overline{B_1}
+        \end{bmatrix}.
+    \end{equation*}
+    Hkrati po točkah \textit{ii}.\ in \textit{v}.\ trditve~\ref{eq5} velja $\chi_{(U^H A U)} = \chi_{U}^{H}\chi_A \chi_{U}$. Naj bo sedaj
+    $$T =
+    T =
+    \begin{bmatrix}
+    1 & 0 & \cdots & 0 \\
+    0 & 0 & I_{n-1} & \vdots \\
+    \vdots & I_{n-1} & 0 & 0 \\
+    0 & \cdots & 0 & 1
+    \end{bmatrix}$$
+    permutacijska matrika. Potem velja 
+    \begin{equation}\tag{2}
+            T^{-1} \chi_{U}^{H}\chi_A \chi_{U} T =  
+        \begin{bmatrix}
+            a & 0 & \alpha_1^T & \alpha_2^T \\
+            0 & a & - \overline{\alpha_2}^T & \overline{\alpha_1}^T\\
+            0 & 0 & B_1 & B_2  \\
+            0 & 0 & - \overline{B_2} & \overline{B_1}
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            \chi_a & \chi_{\alpha^T} \\
+            0 & \chi_B
+        \end{bmatrix}.
+    \end{equation}
+    Matrika $T$ je unitarna. Po točki \textit{vii}.\ trditve~\ref{eq5} velja, da je tudi $\chi_U$ unitarna. Kompleksni matriki (1) in (2) sta torej podobni, torej imata enake lastne vrednosti. 
+    Za $\chi_B$ po indukcijski predpostavki vemo, da ima vsaka njena realna lastna vrednost sodo algebraično
+    večkratnost, zato ima lastna vrednost $a$ matrike $\chi_A$ sodo algebraično večkratnost.
+
+    \medskip
+    Ker je $\chi_A$ kompleksna matrika velikosti $2n \times 2n$, ima, štetih s kratnostjo, natanko $2n$ lastnih vrednosti. Iz tega sledi, da
+    ima matrika $A$ natanko $n$ desnih lastnih vrednosti, ki so ali konjugirani pari kompleksnih števil ali realna števila s sodo algebraično večkratnostjo. Sledi, da natanko $n$ desnih lastnih vrednosti
+    matrike $A$ leži na zgornji kompleksni polravnini (vključno z realno osjo).
+\end{dokaz}
+
+\begin{posledica}\label{sode lastne vrednosti}
+    Naj bosta $A, B \in M_{n}(C)$. Potem ima vsaka realna lastna vrednost matrike
+    $$
+    \begin{bmatrix}
+        A & B \\
+        - \overline{B} & \overline{A}
+    \end{bmatrix},
+    $$
+    (če obstaja), sodo algebraično večkratnost, in njene kompleksne lastne vrednosti se pojavljajo v konjugiranih parih.
+\end{posledica}
+
+\begin{opomba}
+    Lastnim vrednostim iz trditve~\ref{standardne} pravimo \textbf{standardne lastne vrednosti} matrike $A$.
+\end{opomba}
+
+\begin{trditev}\label{podobne_diagonalnim}
+    Naj bo $A \in M_{n}(\mathbb{H})$. Če je $A$ v trikotni obliki, tj.\ vsi elementi pod ali nad diagonalo so enaki 0,
+    potem je vsak element na diagonali matrike $A$ desna lastna vrednost $A$. Še več, vsaka desna lastna 
+    vrednost matrike $A$ je podobna kateremu od elementov na diagonali $A$.
+\end{trditev}
+
+\begin{dokaz}
+    Najprej pokažimo prvi del trditve. Dokaz poteka z indukcijo $n$. Naj bo $A \in M_{n}(\mathbb{H})$ 
+    zgornje trikotna z diagonalnimi elementi $\lambda_1, \lambda_2, \ldots, \lambda_n$. Oglejmo si najprej primer, ko je
+    $n = 1$, torej $A = \lambda, \, \lambda \in \mathbb{H}$. Velja
+    $$\lambda \, 1 = 1 \, \lambda,$$
+    torej je $1$ lastni vektor za (desno) lastno vrednost $\lambda$. Naj bo sedaj $n \geq 2$.
+    Predpostavimo sedaj, da trditev velja za matrike velikosti $n-1$. Matriko $A$ lahko zapišemo kot
+    $$A =
+    \begin{bmatrix}
+        \lambda_1 & \alpha \\
+        0 & A_{1}
+    \end{bmatrix}.
+    $$
+    Velja
+    $$A(1,0,\ldots, 0)^{T} = (1,0,\ldots, 0)^{T}\lambda_1,$$
+    torej je $\lambda_1$ desna lastna vrednost za $A$. Po indukcijski predpostavki ima $A_{1}$ lastne vrednosti $\lambda_2, 
+    \ldots, \lambda_n$.  Pokazati moramo le še, da so lastne vrednosti matrike $A_1$ tudi lastne vrednosti matrike $A$.
+    Recimo, da je $\lambda \in \{\lambda_2, \ldots, \lambda_n\}$. Če je $\lambda$ podobna $\lambda_1$, velja
+    $$\lambda = {q}^{-1}\lambda_1 q.$$
+    Iz opombe~\ref{desne lastne vrednosti} vemo, da so vsi elementi iz $[\lambda_1]$ desne lastne vrednosti za $A$,
+    torej je $\lambda$ desna lastna vrednost za $A$. 
+    Predpostavimo torej lahko, da $\lambda$ in $\lambda_1$ nista 
+    podobna. Velja $A_1 y = y \lambda$ za nek $y \neq 0$. Po trditvi~\ref{enacba} obstaja tak $x \in \mathbb{H}$, da velja
+    $$\lambda_1 x + \alpha y = x\lambda.$$
+    Sledi
+    \begin{equation*}
+        A
+        \begin{bmatrix}
+            x \\
+            y
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            \lambda_1 & \alpha \\
+            0 & A_1
+        \end{bmatrix}
+        \begin{bmatrix}
+            x \\
+            y
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            \lambda_1 x + \alpha y \\
+            A_1 y
+        \end{bmatrix}
+        = 
+        \begin{bmatrix}
+            x \lambda \\
+            y \lambda
+        \end{bmatrix}
+        =
+        \begin{bmatrix}
+            x \\
+            y
+        \end{bmatrix}
+        \lambda,
+    \end{equation*}
+    torej je $\lambda$ res desna lastna vrednost za $A$. 
+
+    \medskip
+    Pokažimo še drugi del trditve. Lema~\ref{lastne vrednosti konjugiranke} 
+    pove, da sta za poljubno desno lastno vrednost $\lambda$ matrike $A$ konjugirani kompleksni števili $\mu, \, \overline{\mu} \in [\lambda]$ lastni vrednosti za $\chi_A$. Ker so diagonalni elementi $A$ desne lastne vrednosti za $A$, sledi, da so jim lastne vrednosti $\chi_A$
+    podobne. Iz tranzitivnosti relacije $\sim$ sledi, da je $\lambda$ podobna enemu od diagonalnih elementov matrike $A$.
+    
+\end{dokaz}
+
+Oglejmo si naslednjo karakterizacijo obrnljivih matrik v $M_{n}(\mathbb{H})$.
+
+\begin{trditev}\label{obrnljiva}
+    Naj bo $A \in M_{n}(\mathbb{H})$. Naslednje izjave so ekvivalentne.
+    \begin{enumerate}
+        \item $A$ je obrnljiva.
+        \item Enačba $Ax = 0$ ima enolično rešitev $x = 0$ v $\mathbb{H}^{n}$.
+        \item $\chi_{A}$ je obrnljiva.
+        \item $A$ nima ničelne lastne vrednosti, tj. če za nek $\lambda \in \mathbb{H}$ in $x \in \mathbb{H}^{n} \setminus \{0\}$ velja 
+        $Ax = \lambda x$ ali $Ax = x \lambda$, potem je $\lambda \neq 0$.
+    \end{enumerate} 
+\end{trditev}
+
+\begin{dokaz}
+Naj bo $A \in M_{n}(\mathbb{H})$. 
+\begin{itemize}
+    \item (\textit{i}.\ $\Rightarrow$ \textit{ii}.) Trivialno.
+    \item (\textit{ii}.\ $\Leftrightarrow$ \textit{iv}.) Izjava v točki \textit{ii}.\ pove, da ne obstaja $x \neq 0$ iz $\mathbb{H}^{n}$, da bi veljalo
+    $$Ax = 0x = x0.$$
+    To pa je ekvivalentno temu, da $A$ nima neničelne lastne vrednosti. 
+    \item (\textit{iii}.\ $\Leftrightarrow$ \textit{iv}.) Matrika $\chi_{A}$ je obrnljiva natanko tedaj, ko nima ničelne lastne vrednosti. Iz dokaza 
+    trditve~\ref{standardne} pa vidimo, da to velja natanko tedaj, ko $A$ nima ničelne lastne vrednosti.
+    \item (\textit{iii}.\ $\Leftrightarrow$ \textit{i}.) Naj bo $\chi_{A}$ obrnljiva in naj bo
+    \begin{equation*}
+        \Bigg[\begin{matrix}
+            B_{1} & B_{2} \\
+            B_{3} & B_{4}
+        \end{matrix}\Bigg]
+        \begin{bmatrix}
+            A_{1} & A_{2} \\
+            - \overline{A_{2}} & \overline{A_{1}}
+        \end{bmatrix}
+        =
+        \Bigg[\begin{matrix}
+        I & 0 \\
+        0 & I
+        \end{matrix}\Bigg].
+    \end{equation*}
+    Zapišimo $B = B_{1} + B_{2}j$. Trivialno je preveriti, da velja $BA = I$ in po trditvi~\ref{inverz} sledi, da je 
+    $A$ obrnljiva.
+\end{itemize} 
+\end{dokaz}
+
+Za konec si oglejmo še trditev, ki s pomočjo do sedaj pridobljenih rezultatov karakterizira lastne vrednosti kvaternionskih matrik.
+
+\begin{trditev}
+    Naj bo $A \in M_n(\mathbb{H})$. Potem ima $A$ natanko $n$ desnih lastnih vrednosti iz različnih ekvivalenčnih razredov.
+\end{trditev}
+
+\begin{dokaz}
+    Naj bo $A \in M_n(\mathbb{H})$. Iz trditve~\ref{standardne} vemo, da ima $A$ natanko $n$ standardnih lastnih vrednosti, tj.\ desnih lastnih
+    vrednosti oblike $\lambda = a + bi, \: b \geq 0$. Recimo, da obstaja $\mu \in \mathbb{H}$,
+    ki ne spada v noben ekvivalenčni razred teh standardnih lastnih vrednosti. Lema~\ref{ekvivalencni_razred} pove, da obstaja neko kopleksno število
+    $z \in [\mu], \, \lvert \mathrm{Im} \: z\rvert \geq 0$, različno od ostalih standardnih lastnih vrednosti. Vendar bi po lemi~\ref{desne lastne vrednosti} 
+    to pomenilo, da je tudi $z$ desna lastna vrednost za $A$, kar je v protislovju s predpostavko, da ima $A$ natanko $n$ standardnih lastnih vrednosti.
+    Tak $\mu$ torej ne obstaja, zato vse desne lastne vrednosti spadajo v natanko $n$ ekvivalenčnih razredov.
+\end{dokaz}
+
+\printbibliography
+
+\end{document}
